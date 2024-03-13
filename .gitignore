@@ -1,0 +1,12 @@
+# default ignore files
+/target/
+/deps/
+*.swp
+*.swo
+*.tmp
+*.pyc
+/outputs/
+*.egg-info
+*dist/
+*build/
+/data/

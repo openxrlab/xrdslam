@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xrdslam"
+version = "0.1.0"
+readme = "README.md"
+requires-python = ">=3.7.0"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python",
+]
+
+[tool.setuptools.packages.find]
+include = ["deepslam*", "scripts*"]
+
+[project.scripts]
+ds-run = "scripts.run:entrypoint"
+ds-eval = "scripts.eval:entrypoint"
+ds-viewer = "scripts.viewer:entrypoint"
+ds-download-data = "scripts.download_data:entrypoint"
