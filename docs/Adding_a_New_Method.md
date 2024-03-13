@@ -1,12 +1,12 @@
 # Pipeline
 
-The figure below is the algorithm pipeline. When adding a new **deepslam** method, you need to register the method in **input_config.py** and re-inherit and implement the functions in the **Algorithm** and **Model** classes.
+The figure below is the algorithm pipeline. When adding a new **deepslam** algorithm, you need to register the algorithm in **input_config.py** and re-inherit and implement the functions in the **Algorithm** and **Model** classes.
 
 ![img](./imgs/pipeline.png)
 
 # File Structure
 
-When adding a new deep-slam method, the recommended file structure is as follows:
+When adding a new deep-slam algorithm, the recommended file structure is as follows:
 
 ```
 ├── slam
@@ -40,7 +40,7 @@ from slam.algorithms.base_algorithm import Algorithm, AlgorithmConfig
 class MySLAMConfig(AlgorithmConfig):
     """MyAlgorithm  Config."""
     _target: Type = field(default_factory=lambda: MySLAM)
-    # method config params
+    # algorithm config params
 
 class MySLAM(Algorithm):
 
@@ -100,7 +100,7 @@ class MyModel(Model):
         pass
 ```
 
-# Registering custom method with xrdslam
+# Registering custom algorithm with xrdslam
 
 ```python
 """slam/configs/input_config.py"""
@@ -112,15 +112,15 @@ descriptions = {
     'MySLAM': 'Implementation of MySLAM.',
 }
 
-method_configs['my-slam'] = XRDSLAMerConfig(
-    method_name='my-slam',
+algorithm_configs['my-slam'] = XRDSLAMerConfig(
+    algorithm_name='my-slam',
     xrdslam=XRDSLAMConfig(
         tracker=TrackerConfig(map_every=5,
                               render_freq=50,
                               use_relative_pose=False,
                               save_debug_result=False),
         mapper=MapperConfig(keyframe_every=50, ),
-        method=MySLAMConfig(
+        algorithm=MySLAMConfig(
             tracking_n_iters=10,
             mapping_n_iters=60,
             mapping_first_n_iters=1500,
@@ -143,9 +143,9 @@ method_configs['my-slam'] = XRDSLAMerConfig(
     ))
 ```
 
-# Running custom method
+# Running custom algorithm
 
-After registering your method you should be able to run the method with,
+After registering your algorithm you should be able to run the algorithm with,
 
 ```python
 ds-run my-slam --data DATA_DIR  --data-type  replica

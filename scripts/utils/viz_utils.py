@@ -37,7 +37,7 @@ def create_camera_actor(i, is_gt=False, scale=0.005):
 
 
 def draw_trajectory(queue, output, init_pose, cam_scale, save_rendering, near,
-                    estimate_c2w_list, gt_c2w_list, method_name):
+                    estimate_c2w_list, gt_c2w_list, algorithm_name):
 
     draw_trajectory.queue = queue
     draw_trajectory.cameras = {}
@@ -160,7 +160,7 @@ def draw_trajectory(queue, output, init_pose, cam_scale, save_rendering, near,
 
     # set the viewer's pose in the back of the first frame's pose
     param = ctr.convert_to_pinhole_camera_parameters()
-    if method_name != 'splaTAM':
+    if algorithm_name != 'splaTAM':
         init_pose[:3, 3] += 6 * normalize(init_pose[:3, 2])
         init_pose[:3, 2] *= -1
         init_pose[:3, 1] *= -1
@@ -185,20 +185,20 @@ class SLAMFrontend:
                  near=0,
                  estimate_c2w_list=None,
                  gt_c2w_list=None,
-                 method_name=None):
+                 algorithm_name=None):
         self.queue = Queue()
-        self.method_name = method_name
+        self.algorithm_name = algorithm_name
         self.p = Process(target=draw_trajectory,
                          args=(self.queue, output, init_pose, cam_scale,
                                save_rendering, near, estimate_c2w_list,
-                               gt_c2w_list, method_name))
+                               gt_c2w_list, algorithm_name))
 
     def update_pose(self, index, pose, gt=False):
         if isinstance(pose, torch.Tensor):
             pose = pose.cpu().numpy()
 
         # Note: splaTAM should not use pose[:3, 2] *= -1
-        if self.method_name != 'splaTAM':
+        if self.algorithm_name != 'splaTAM':
             pose[:3, 2] *= -1
         self.queue.put_nowait(('pose', index, pose, gt))
 

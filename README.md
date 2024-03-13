@@ -4,7 +4,7 @@
 
 OpenXRLab Visual-inertial DeepSLAM Toolbox and Benchmark. It is a part of the OpenXRLab project.
 
-We provide a set of pre implemented xrdslam methods.
+We provide a set of pre implemented xrdslam algorithms.
 
 | Replica/office0                                              |                                                              |                                                              |                                                              |                                                              |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -103,16 +103,16 @@ The minimal command is:
 ds-run nice-slam --data YOUR_DATA --data-type DATA_TYPE
 ```
 
-To learn about the available methods:
+To learn about the available algorithms:
 
 ```
 ds-run -h
 ```
 
-To learn about a methods parameters:
+To learn about a algorithms parameters:
 
 ```
-ds-run {method} -h
+ds-run {algorithm} -h
 ```
 
 #### ds-viewer
@@ -120,7 +120,7 @@ ds-run {method} -h
 Start the offline viewer.
 
 ```bash
-usage: ds-viewer [-h] [--config.vis-dir PATH] [--config.save-rendering {True,False}] [--config.method-name {None}|STR]
+usage: ds-viewer [-h] [--config.vis-dir PATH] [--config.save-rendering {True,False}] [--config.algorithm-name {None}|STR]
 ```
 
 ##### options
@@ -133,9 +133,9 @@ usage: ds-viewer [-h] [--config.vis-dir PATH] [--config.save-rendering {True,Fal
 
   Save the rendering result or not. (default: True)
 
-- --config.method-name
+- --config.algorithm-name
 
-  NOTE: When use splaTAM, method name should be set. (default: None)
+  NOTE: When use splaTAM, algorithm name should be set. (default: None)
 
 #### ds-eval
 
@@ -155,9 +155,9 @@ usage: ds-eval [-h] --output-dir PATH --gt-mesh {None}|STR
 
   Path to ground-truth mesh file. (required)
 
-### 4. Adding your own method
+### 4. Adding your own algorithm
 
-The figure below is the algorithm pipeline. When adding a new **deepslam** method, you need to register the method in **input_config.py** and re-inherit and implement the functions in the **Algorithm** and **Model** classes. For details, please see [Adding a New Algorithm ](docs/Adding_a_New_Algorithm.md)
+The figure below is the algorithm pipeline. When adding a new **deepslam** algorithm, you need to register the algorithm in **input_config.py** and re-inherit and implement the functions in the **Algorithm** and **Model** classes. For details, please see [Adding a New Algorithm ](docs/Adding_a_New_Algorithm.md)
 
 ![pipeline](docs/imgs/pipeline.png)
 
@@ -165,7 +165,7 @@ The figure below is the algorithm pipeline. When adding a new **deepslam** metho
 
 Here are the comparison results on **Replica** datasets. The results of the original algorithm comes from multiple papers.
 
-The methods with _X suffix are the corresponding methods in the XRDSLAM framework. For details, please see [Benchmark](docs/Benchmark.md)
+The algorithms with _X suffix are the corresponding algorithms in the XRDSLAM framework. For details, please see [Benchmark](docs/Benchmark.md)
 
 Note: The default configuration in the algorithm is suitable for Replica. If you use other datasets, you need to modify the corresponding configuration items in slam/configs/input_config.py.
 

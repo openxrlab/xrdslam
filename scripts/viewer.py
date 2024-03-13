@@ -22,7 +22,7 @@ class OfflineViewerConfig(PrintableConfig):
     """Offline data path from xrdslam."""
     save_rendering: bool = True
     """Save the rendering result or not."""
-    method_name: Optional[str] = None
+    algorithm_name: Optional[str] = None
 
 
 @dataclass
@@ -34,7 +34,7 @@ class OfflineViewer:
     def main(self) -> None:
         """Main function."""
         vis_dir = self.config.vis_dir
-        method_name = self.config.method_name
+        algorithm_name = self.config.algorithm_name
         # read trajs
         if os.path.exists(vis_dir):
             eval_file = [
@@ -55,7 +55,7 @@ class OfflineViewer:
                                 near=0,
                                 estimate_c2w_list=estimate_c2w_list,
                                 gt_c2w_list=gt_c2w_list,
-                                method_name=method_name).start()
+                                algorithm_name=algorithm_name).start()
 
         for i in tqdm(range(0, N + 1)):
             img_file = f'{vis_dir}/imgs/{i:05d}.jpg'
@@ -75,14 +75,14 @@ class OfflineViewer:
                     frontend.update_cloud(cloudfile)
             frontend.update_pose(1, estimate_c2w_list[i], gt=False)
             # Note: not show gt_traj for splaTAM
-            if method_name != 'splaTAM':
+            if algorithm_name != 'splaTAM':
                 frontend.update_pose(1, gt_c2w_list[i], gt=True)
             # the visualizer might get stuck if update every frame
             # with a long sequence (10000+ frames)
             if i % 10 == 0:
                 frontend.update_cam_trajectory(i, gt=False)
                 # Note: not show gt_traj for splaTAM
-                if method_name != 'splaTAM':
+                if algorithm_name != 'splaTAM':
                     frontend.update_cam_trajectory(i, gt=True)
 
         if self.config.save_rendering:
