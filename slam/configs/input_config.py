@@ -7,20 +7,20 @@ from typing import Dict
 
 import tyro
 
+from slam.algorithms.coslam import CoSLAMConfig
+from slam.algorithms.nice_slam import NiceSLAMConfig
+from slam.algorithms.point_slam import PointSLAMConfig
+from slam.algorithms.splatam import SplaTAMConfig
+from slam.algorithms.voxfusion import VoxFusionConfig
 from slam.common.mesher import MesherConfig
 from slam.engine.optimizers import AdamOptimizerConfig
 from slam.engine.schedulers import (LRconfig, NiceSLAMSchedulerConfig,
                                     PointSLAMSchedulerConfig)
 from slam.engine.xrdslamer import XRDSLAMerConfig
-from slam.methods.coslam import CoSLAMConfig
-from slam.methods.nice_slam import NiceSLAMConfig
-from slam.methods.point_slam import PointSLAMConfig
-from slam.methods.splatam import SplaTAMConfig
-from slam.methods.voxfusion import VoxFusionConfig
 from slam.models.conv_onet import ConvOnetConfig
 from slam.models.conv_onet2 import ConvOnet2Config
 from slam.models.gaussian_splatting import GaussianSplattingConfig
-from slam.models.JointEncoding import JointEncodingConfig
+from slam.models.joint_encoding import JointEncodingConfig
 from slam.models.sparse_voxel import SparseVoxelConfig
 from slam.pipeline.mapper import MapperConfig
 from slam.pipeline.tracker import TrackerConfig
