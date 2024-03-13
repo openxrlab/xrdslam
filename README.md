@@ -1,7 +1,5 @@
 # XRDSLAM
 
-[![actions](https://github.com/openxrlab/xrdslam/workflows/build/badge.svg)](https://github.com/openxrlab/xrdslam/actions) [![LICENSE](https://img.shields.io/github/license/openxrlab/xrdslam.svg)](https://github.com/openxrlab/xrdslam/blob/main/LICENSE)
-
 ## Introduction
 
 OpenXRLab Visual-inertial DeepSLAM Toolbox and Benchmark. It is a part of the OpenXRLab project.
