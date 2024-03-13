@@ -41,12 +41,6 @@ cd third_party
 bash install.sh
 ```
 
-Replace the filename in `slam/models/sparse_voxel.py` with the built library, like:
-
-``` python
-torch.classes.load_library("third_party/sparse_octforest/build/lib.linux-x86_64-cpython-310/forest.cpython-310-x86_64-linux-gnu.so")
-```
-
 ### 2. Build and Run
 
 ```bash
