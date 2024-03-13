@@ -7,7 +7,7 @@ import torch
 from torch.nn import Parameter
 
 from slam.common.camera import Camera
-from slam.model_components.gaussian_cloud_splaTAM import GaussianCloud
+from slam.model_components.gaussian_cloud_splatam import GaussianCloud
 from slam.model_components.slam_external_splatam import calc_ssim
 from slam.model_components.slam_helpers_splatam import l1_loss_v1
 from slam.models.base_model import Model, ModelConfig
