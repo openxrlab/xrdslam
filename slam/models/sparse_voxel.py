@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass, field
 from typing import Dict, List, Type, Union
 
@@ -16,10 +17,22 @@ from slam.model_components.voxel_helpers_voxfusion import (get_features,
                                                            ray_sample)
 from slam.models.base_model import Model, ModelConfig
 
+
 # load .so
-torch.classes.load_library(
-    '/data/codes/DL-SLAM/xrdslam/third_party/sparse_octforest/build/'
-    'lib.linux-x86_64-cpython-310/forest.cpython-310-x86_64-linux-gnu.so')
+def find_so_files(directory):
+    so_files = []
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if file.endswith('.so'):
+                so_files.append(os.path.join(root, file))
+    return so_files
+
+
+search_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                '../../third_party/sparse_octforest/build/')
+so_files = find_so_files(search_directory)
+for so_file in so_files:
+    torch.classes.load_library(so_file)
 
 
 @dataclass

@@ -25,7 +25,7 @@ class XRDSLAMerConfig(InstantiateConfig):
     data: Optional[Path] = None
     data_type: Optional[str] = 'tumrgbd'
     output_dir: Path = Path('outputs')
-    method_name: Optional[str] = None
+    algorithm_name: Optional[str] = None
 
     def print_to_terminal(self) -> None:
         """Helper to pretty print config to terminal."""

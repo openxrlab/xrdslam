@@ -28,7 +28,7 @@ class XRDSLAMConfig(InstantiateConfig):
 
     tracker: TrackerConfig = TrackerConfig()
     mapper: MapperConfig = MapperConfig()
-    method: AlgorithmConfig = AlgorithmConfig()
+    algorithm: AlgorithmConfig = AlgorithmConfig()
     enable_vis: bool = True
     visualizer: VisualizerConfig = VisualizerConfig()
 
@@ -46,11 +46,11 @@ class XRDSLAM():
         mp.set_start_method('spawn', force=True)
         # Use a BaseManager to create a shared Algorithm instance
         manager = BaseManager()
-        manager.register('ShareAlgorithm', self.config.method._target)
+        manager.register('ShareAlgorithm', self.config.algorithm._target)
         manager.start()
-        self.method = manager.ShareAlgorithm(config=self.config.method,
-                                             camera=self.camera,
-                                             device=self.config.device)
+        self.algorithm = manager.ShareAlgorithm(config=self.config.algorithm,
+                                                camera=self.camera,
+                                                device=self.config.device)
 
         # mapframe buffer
         self.map_buffer = mp.Queue(maxsize=1)
@@ -72,12 +72,12 @@ class XRDSLAM():
 
     def run(self):
         mapping_process = mp.Process(target=self.mapper.spin,
-                                     args=(self.map_buffer, self.method,
+                                     args=(self.map_buffer, self.algorithm,
                                            self.event_ready,
                                            self.event_processed))
         mapping_process.start()
         tracking_process = mp.Process(target=self.tracker.spin,
-                                      args=(self.map_buffer, self.method,
+                                      args=(self.map_buffer, self.algorithm,
                                             self.viz_buffer, self.event_ready,
                                             self.event_processed))
         tracking_process.start()

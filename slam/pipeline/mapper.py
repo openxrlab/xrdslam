@@ -18,7 +18,7 @@ class Mapper():
     def __init__(self, config: MapperConfig) -> None:
         self.config = config
 
-    def spin(self, map_buffer, method, event_ready, event_processed):
+    def spin(self, map_buffer, algorithm, event_ready, event_processed):
         cur_frame = None
         while True:
 
@@ -27,13 +27,13 @@ class Mapper():
 
                 cur_frame = map_buffer.get()
 
-                method.do_mapping(cur_frame)
+                algorithm.do_mapping(cur_frame)
                 # update pose
-                method.update_framepose(cur_frame.fid,
-                                        cur_frame.get_pose().detach())
+                algorithm.update_framepose(cur_frame.fid,
+                                           cur_frame.get_pose().detach())
 
                 if cur_frame.fid % self.config.keyframe_every == 0:
-                    method.add_keyframe(cur_frame)
+                    algorithm.add_keyframe(cur_frame)
 
                 torch.cuda.empty_cache()
 
@@ -41,7 +41,7 @@ class Mapper():
                 event_processed.set()
 
             # exit
-            if method.is_finished() and map_buffer.empty():
+            if algorithm.is_finished() and map_buffer.empty():
                 event_processed.clear()
                 event_ready.clear()
                 break

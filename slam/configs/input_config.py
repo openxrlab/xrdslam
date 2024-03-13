@@ -1,4 +1,4 @@
-"""Put all the method implementations in one location."""
+"""Put all the algorithm implementations in one location."""
 
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ from slam.pipeline.tracker import TrackerConfig
 from slam.pipeline.visualizer import VisualizerConfig
 from slam.pipeline.xrdslam import XRDSLAMConfig
 
-method_configs: Dict[str, XRDSLAMerConfig] = {}
+algorithm_configs: Dict[str, XRDSLAMerConfig] = {}
 
 descriptions = {
     'nice-slam': 'Inplementation of nice-slam.',
@@ -37,15 +37,15 @@ descriptions = {
     'splaTAM': 'Implementation of splaTAM.',
 }
 
-method_configs['nice-slam'] = XRDSLAMerConfig(
-    method_name='nice-slam',
+algorithm_configs['nice-slam'] = XRDSLAMerConfig(
+    algorithm_name='nice-slam',
     xrdslam=XRDSLAMConfig(
         tracker=TrackerConfig(map_every=5,
                               render_freq=50,
                               use_relative_pose=False,
                               save_debug_result=False),
         mapper=MapperConfig(keyframe_every=50, ),
-        method=NiceSLAMConfig(
+        algorithm=NiceSLAMConfig(
             coarse=True,
             tracking_n_iters=10,
             mapping_n_iters=60,
@@ -151,8 +151,8 @@ method_configs['nice-slam'] = XRDSLAMerConfig(
         device='cuda:0',
     ))
 
-method_configs['vox-fusion'] = XRDSLAMerConfig(
-    method_name='vox-fusion',
+algorithm_configs['vox-fusion'] = XRDSLAMerConfig(
+    algorithm_name='vox-fusion',
     xrdslam=XRDSLAMConfig(
         tracker=TrackerConfig(map_every=1,
                               render_freq=50,
@@ -160,8 +160,8 @@ method_configs['vox-fusion'] = XRDSLAMerConfig(
                               save_debug_result=False,
                               init_pose_offset=10),
         mapper=MapperConfig(keyframe_every=10, ),
-        method=VoxFusionConfig(
-            # keyframe_selection_method='random',
+        algorithm=VoxFusionConfig(
+            # keyframe_selection_algorithm='random',
             tracking_n_iters=30,
             mapping_n_iters=15,  # 30
             mapping_first_n_iters=100,
@@ -195,15 +195,15 @@ method_configs['vox-fusion'] = XRDSLAMerConfig(
     )  # TODO: only support cuda:0 now
 )
 
-method_configs['co-slam'] = XRDSLAMerConfig(
-    method_name='co-slam',
+algorithm_configs['co-slam'] = XRDSLAMerConfig(
+    algorithm_name='co-slam',
     xrdslam=XRDSLAMConfig(
         tracker=TrackerConfig(map_every=5,
                               render_freq=50,
                               use_relative_pose=False,
                               save_debug_result=False),
         mapper=MapperConfig(keyframe_every=5, ),
-        method=CoSLAMConfig(
+        algorithm=CoSLAMConfig(
             separate_LR=True,
             retain_graph=True,
             rot_rep='axis_angle',
@@ -290,8 +290,8 @@ method_configs['co-slam'] = XRDSLAMerConfig(
         enable_vis=False,
         device='cuda:0'))
 
-method_configs['point-slam'] = XRDSLAMerConfig(
-    method_name='point-slam',
+algorithm_configs['point-slam'] = XRDSLAMerConfig(
+    algorithm_name='point-slam',
     xrdslam=XRDSLAMConfig(
         tracker=TrackerConfig(map_every=5,
                               lazy_start=20,
@@ -299,7 +299,7 @@ method_configs['point-slam'] = XRDSLAMerConfig(
                               use_relative_pose=False,
                               save_debug_result=False),
         mapper=MapperConfig(keyframe_every=20, ),
-        method=PointSLAMConfig(
+        algorithm=PointSLAMConfig(
             separate_LR=True,
             tracking_n_iters=40,
             mapping_n_iters=300,
@@ -369,15 +369,15 @@ method_configs['point-slam'] = XRDSLAMerConfig(
         enable_vis=False,
         device='cuda:0'))
 
-method_configs['splaTAM'] = XRDSLAMerConfig(
-    method_name='splaTAM',
+algorithm_configs['splaTAM'] = XRDSLAMerConfig(
+    algorithm_name='splaTAM',
     xrdslam=XRDSLAMConfig(
         tracker=TrackerConfig(map_every=1,
                               render_freq=50,
                               use_relative_pose=True,
                               save_debug_result=False),
         mapper=MapperConfig(keyframe_every=5, ),
-        method=SplaTAMConfig(
+        algorithm=SplaTAMConfig(
             retain_graph=False,
             separate_LR=True,
             keyframe_use_ray_sample=False,
@@ -429,7 +429,7 @@ method_configs['splaTAM'] = XRDSLAMerConfig(
 AnnotatedBaseConfigUnion = tyro.conf.SuppressFixed[
     # Don't show unparsable (fixed) arguments in helptext.
     tyro.conf.FlagConversionOff[tyro.extras.subcommand_type_from_defaults(
-        defaults=method_configs, descriptions=descriptions)]]
+        defaults=algorithm_configs, descriptions=descriptions)]]
 """Union[] type over config types, annotated with default instances for use
 with tyro.cli(). Allows the user to pick between one of several base
 configurations, and then override values in it."""

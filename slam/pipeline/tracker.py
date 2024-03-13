@@ -46,7 +46,7 @@ class Tracker():
         self.frame_cnt, self.psnr_sum, self.ssim_sum, self.lpips_sum, \
             self.depth_l1_render_sum = 0, 0, 0, 0, 0
 
-    def spin(self, map_buffer, method, viz_buffer, event_ready,
+    def spin(self, map_buffer, algorithm, viz_buffer, event_ready,
              event_processed):
         pbar = tqdm(
             DataLoader(self.dataset,
@@ -79,64 +79,64 @@ class Tracker():
             init_pose = self.predict_current_pose(
                 idx_np,
                 gt_c2w_np,
-                estimate_c2w_list=method.get_estimate_c2w_list())
+                estimate_c2w_list=algorithm.get_estimate_c2w_list())
 
             current_frame = Frame(fid=idx_np,
                                   rgb=gt_color_np,
                                   depth=gt_depth_np,
                                   gt_pose=gt_c2w_np,
                                   init_pose=init_pose,
-                                  separate_LR=method.is_separate_LR(),
-                                  rot_rep=method.get_rot_rep())
+                                  separate_LR=algorithm.is_separate_LR(),
+                                  rot_rep=algorithm.get_rot_rep())
 
             candidate_c2w = None
             # optimize curframe pose
-            if method.is_initialized():
-                candidate_c2w = method.do_tracking(current_frame)
+            if algorithm.is_initialized():
+                candidate_c2w = algorithm.do_tracking(current_frame)
                 current_frame.set_pose(candidate_c2w,
-                                       separate_LR=method.is_separate_LR(),
-                                       rot_rep=method.get_rot_rep())
+                                       separate_LR=algorithm.is_separate_LR(),
+                                       rot_rep=algorithm.get_rot_rep())
 
             # for visualize and  extract mesh
             cur_c2w = current_frame.get_pose()
             cur_c2w_np = cur_c2w.clone().detach().cpu().numpy()
-            method.add_framepose(cur_c2w.detach(), gt_c2w, gt_c2w_ori)
+            algorithm.add_framepose(cur_c2w.detach(), gt_c2w, gt_c2w_ori)
 
             # show result: extract mesh and send to visualizer
-            if self.enable_vis and method.is_initialized(
+            if self.enable_vis and algorithm.is_initialized(
             ) and self.config.render_freq > 0 and (
                     idx_np) % self.config.render_freq == 0:
                 # pose
                 viz_buffer.put_nowait(('pose', idx_np, cur_c2w_np, gt_c2w_np))
                 # render img
-                rcolor_np, rdepth_np = method.render_img(
+                rcolor_np, rdepth_np = algorithm.render_img(
                     c2w=cur_c2w_np, gt_depth=gt_depth_np,
                     idx=idx_np)  # color: [H, W, C], depth: [H, W]
                 viz_buffer.put_nowait(('img', idx_np, gt_color_np, gt_depth_np,
                                        rcolor_np, rdepth_np))
                 # extract mesh
-                mesh = method.get_mesh()
+                mesh = algorithm.get_mesh()
                 if mesh is not None:
                     culled_mesh = cull_mesh(
                         dataset=self.dataset,
                         mesh=mesh,
-                        estimate_c2w_list=method.get_estimate_c2w_list(),
+                        estimate_c2w_list=algorithm.get_estimate_c2w_list(),
                         eval_rec=True)
                     viz_buffer.put_nowait(('mesh', idx_np, culled_mesh))
                 # get pointcloud
-                cloud = method.get_cloud(cur_c2w_np, gt_depth_np=gt_depth_np)
+                cloud = algorithm.get_cloud(cur_c2w_np,
+                                            gt_depth_np=gt_depth_np)
                 if cloud is not None:
                     viz_buffer.put_nowait(('cloud', idx_np, cloud))
 
             if not self.enable_vis and self.config.save_debug_result and \
-                method.is_initialized() and self.config.render_freq > 0 \
+                algorithm.is_initialized() and self.config.render_freq > 0 \
                     and ((idx_np) % self.config.render_freq == 0
                          or idx_np == len(self.dataset) - 1):
                 # save imgs
                 imgs_save_path = f'{self.out_dir}/imgs'
-                rcolor_np, rdepth_np = method.render_img(c2w=cur_c2w_np,
-                                                         gt_depth=gt_depth_np,
-                                                         idx=idx_np)
+                rcolor_np, rdepth_np = algorithm.render_img(
+                    c2w=cur_c2w_np, gt_depth=gt_depth_np, idx=idx_np)
                 result_2d = save_render_imgs(idx_np,
                                              gt_color_np=gt_color_np,
                                              gt_depth_np=gt_depth_np,
@@ -156,17 +156,17 @@ class Tracker():
                 mesh_savepath = f'{self.out_dir}/mesh/{idx_np:05d}.ply'
                 if idx_np == len(self.dataset) - 1:
                     mesh_savepath = f'{self.out_dir}/final_mesh_rec.ply'
-                mesh = method.get_mesh()
+                mesh = algorithm.get_mesh()
                 if mesh is not None:
                     culled_mesh = cull_mesh(
                         dataset=self.dataset,
                         mesh=mesh,
-                        estimate_c2w_list=method.get_estimate_c2w_list(),
+                        estimate_c2w_list=algorithm.get_estimate_c2w_list(),
                         eval_rec=True)
                     culled_mesh.export(mesh_savepath)
                 # save cloud
                 cloud_savepath = f'{self.out_dir}/cloud/{idx_np:05d}.ply'
-                cloud = method.get_cloud(
+                cloud = algorithm.get_cloud(
                     cur_c2w_np,
                     gt_depth_np=gt_depth_np)  # o3d.geometry.PointCloud
                 if cloud is not None:
@@ -179,9 +179,9 @@ class Tracker():
                 traj_savepath = os.path.join(self.out_dir, 'eval.tar')
                 torch.save(
                     {
-                        'gt_c2w_list_ori': method.get_gt_c2w_list_ori(),
-                        'gt_c2w_list': method.get_gt_c2w_list(),
-                        'estimate_c2w_list': method.get_estimate_c2w_list(),
+                        'gt_c2w_list_ori': algorithm.get_gt_c2w_list_ori(),
+                        'gt_c2w_list': algorithm.get_gt_c2w_list(),
+                        'estimate_c2w_list': algorithm.get_estimate_c2w_list(),
                         'idx': idx,
                     },
                     traj_savepath,
@@ -217,7 +217,7 @@ class Tracker():
                            batch_size=1,
                            shuffle=False,
                            num_workers=1))
-            estimate_c2w_list = method.get_estimate_c2w_list()
+            estimate_c2w_list = algorithm.get_estimate_c2w_list()
             for idx, gt_color, gt_depth, gt_c2w in pbar:
                 idx_np = idx[0].cpu().numpy()
                 gt_depth_np = gt_depth[0].cpu().numpy()
@@ -226,7 +226,7 @@ class Tracker():
                 if idx_np % self.config.render_freq == 0:
                     # save imgs
                     imgs_save_path = f'{self.out_dir}/imgs'
-                    rcolor_np, rdepth_np = method.render_img(
+                    rcolor_np, rdepth_np = algorithm.render_img(
                         c2w=cur_c2w_np, gt_depth=gt_depth_np, idx=idx_np)
                     result_2d = save_render_imgs(idx_np,
                                                  gt_color_np=gt_color_np,
@@ -245,21 +245,21 @@ class Tracker():
                     self.frame_cnt += 1
                 # save final mesh
                 if idx_np == len(self.dataset) - 1:
-                    mesh = method.get_mesh()
+                    mesh = algorithm.get_mesh()
                     if mesh is not None:
                         mesh_savepath = f'{self.out_dir}/final_mesh.ply'
-                        culled_mesh = cull_mesh(
-                            dataset=self.dataset,
-                            mesh=mesh,
-                            estimate_c2w_list=method.get_estimate_c2w_list(),
-                            eval_rec=False)
+                        culled_mesh = cull_mesh(dataset=self.dataset,
+                                                mesh=mesh,
+                                                estimate_c2w_list=algorithm.
+                                                get_estimate_c2w_list(),
+                                                eval_rec=False)
                         culled_mesh.export(mesh_savepath)
                         mesh_savepath = f'{self.out_dir}/final_mesh_rec.ply'
-                        culled_mesh = cull_mesh(
-                            dataset=self.dataset,
-                            mesh=mesh,
-                            estimate_c2w_list=method.get_estimate_c2w_list(),
-                            eval_rec=True)
+                        culled_mesh = cull_mesh(dataset=self.dataset,
+                                                mesh=mesh,
+                                                estimate_c2w_list=algorithm.
+                                                get_estimate_c2w_list(),
+                                                eval_rec=True)
                         culled_mesh.export(mesh_savepath)
 
             # print 2d render metric
@@ -273,16 +273,16 @@ class Tracker():
             traj_savepath = os.path.join(self.out_dir, 'eval.tar')
             torch.save(
                 {
-                    'gt_c2w_list_ori': method.get_gt_c2w_list_ori(),
-                    'gt_c2w_list': method.get_gt_c2w_list(),
-                    'estimate_c2w_list': method.get_estimate_c2w_list(),
+                    'gt_c2w_list_ori': algorithm.get_gt_c2w_list_ori(),
+                    'gt_c2w_list': algorithm.get_gt_c2w_list(),
+                    'estimate_c2w_list': algorithm.get_estimate_c2w_list(),
                     'idx': idx,
                 },
                 traj_savepath,
                 _use_new_zipfile_serialization=False)
 
         # set finished
-        method.set_finished()
+        algorithm.set_finished()
 
     def check_mapframe(self, check_frame, map_buffer):
         if check_frame.fid <= self.config.lazy_start:
