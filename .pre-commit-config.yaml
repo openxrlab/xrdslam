@@ -1,4 +1,4 @@
-exclude: '^deepslam/model_components/slam_helpers_splatam\.py$|^scripts/download_data\.py$|^test/data/'
+exclude: '^slam/model_components/slam_helpers_splatam\.py$|^scripts/download_data\.py$|^test/data/'
 
 repos:
   - repo: https://github.com/pycqa/flake8.git

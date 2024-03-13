@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import tyro
 
-from deepslam.configs.config_utils import convert_markup_to_ansi
-from deepslam.configs.input_config import AnnotatedBaseConfigUnion
-from deepslam.engine.xrdslamer import XRDSLAMer, XRDSLAMerConfig
+from slam.configs.config_utils import convert_markup_to_ansi
+from slam.configs.input_config import AnnotatedBaseConfigUnion
+from slam.engine.xrdslamer import XRDSLAMer, XRDSLAMerConfig
 
 
 def main(config: XRDSLAMerConfig) -> None:

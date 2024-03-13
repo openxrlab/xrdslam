@@ -18,7 +18,7 @@ from scripts.utils.eval_recon import (calc_2d_metric, calc_3d_metric,
 class EvalMatrics:
     """Evaluate trajectory accuracy and 3D reconstruction quality."""
 
-    # Path to xrdeepslam running result.
+    # Path to xrdslam running result.
     output_dir: Path
     # Path to groundtruth mesh file.
     gt_mesh: Optional[str] = 'None'

@@ -9,7 +9,7 @@ The figure below is the algorithm pipeline. When adding a new **deepslam** metho
 When adding a new deep-slam method, the recommended file structure is as follows:
 
 ```
-├── deepslam
+├── slam
 │   ├── configs
 │   │   └── input_config.py
 │   ├── methods
@@ -25,16 +25,16 @@ When adding a new deep-slam method, the recommended file structure is as follows
 
 # Inherit and implement BaseMethod
 
-First create deepslam/methods/my_slam.py:
+First create slam/methods/my_slam.py:
 
 ```python
-"""deepslam/methods/my_slam.py"""
+"""slam/methods/my_slam.py"""
 
 import functools
 from dataclasses import dataclass, field
 from typing import List, Type
 import torch
-from deepslam.methods.base_method import Method, MethodConfig
+from slam.methods.base_method import Method, MethodConfig
 
 @dataclass
 class MySLAMConfig(MethodConfig):
@@ -63,16 +63,16 @@ class MySLAM(Method):
 
 # Inherit and implement BaseModel
 
-First create deepslam/models/my_model.py:
+First create slam/models/my_model.py:
 
 ```python
-"""deepslam/models/my_model.py"""
+"""slam/models/my_model.py"""
 
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Type, Union
 import torch
 from torch.nn import Parameter
-from deepslam.models.base_model import Model, ModelConfig
+from slam.models.base_model import Model, ModelConfig
 
 @dataclass
 class MyModelConfig(ModelConfig):
@@ -100,13 +100,13 @@ class MyModel(Model):
         pass
 ```
 
-# Registering custom method with deepslam
+# Registering custom method with xrdslam
 
 ```python
-"""deepslam/configs/input_config.py"""
+"""slam/configs/input_config.py"""
 
-from deepslam.methods.my_slam import MySLAMConfig
-from deepslam.models.my_model import MyModelConfig
+from slam.methods.my_slam import MySLAMConfig
+from slam.models.my_model import MyModelConfig
 
 descriptions = {
     'MySLAM': 'Implementation of MySLAM.',

@@ -11,7 +11,7 @@ from pathlib import Path
 import tyro
 from typing_extensions import Annotated
 
-from deepslam.configs.base_config import PrintableConfig
+from slam.configs.base_config import PrintableConfig
 
 
 @dataclass
@@ -28,7 +28,7 @@ class DatasetDownload(PrintableConfig):
 
 
 # pylint: disable=line-too-long
-deepslam_downloads = {
+slam_downloads = {
     'f1_desk':
     'https://vision.in.tum.de/rgbd/dataset/freiburg1/rgbd_dataset_freiburg1_desk.tgz',
     'f1_desk2':
@@ -46,28 +46,28 @@ deepslam_downloads = {
     'all': None,
 }
 
-CaptureName = tyro.extras.literal_type_from_choices(deepslam_downloads.keys())
+CaptureName = tyro.extras.literal_type_from_choices(slam_downloads.keys())
 
 
 @dataclass
-class DeepSLAMDatasetDownload(DatasetDownload):
+class SLAMDatasetDownload(DatasetDownload):
     """Download the dataset."""
 
     capture_name: CaptureName = 'f1_desk'
 
     def download(self, save_dir: Path):
         if self.capture_name == 'all':
-            for capture_name in deepslam_downloads:
+            for capture_name in slam_downloads:
                 if capture_name != 'all':
-                    DeepSLAMDatasetDownload(
+                    SLAMDatasetDownload(
                         capture_name=capture_name).download(save_dir)
             return
 
-        assert (self.capture_name in deepslam_downloads
+        assert (self.capture_name in slam_downloads
                 ), f'Capture name {self.capture_name} not found \
-            in {deepslam_downloads.keys()}'
+            in {slam_downloads.keys()}'
 
-        url = deepslam_downloads[self.capture_name]
+        url = slam_downloads[self.capture_name]
 
         target_path = str(save_dir / self.capture_name)
         os.makedirs(target_path, exist_ok=True)
@@ -103,7 +103,7 @@ class DeepSLAMDatasetDownload(DatasetDownload):
         os.remove(download_path)
 
 
-Commands = Annotated[DeepSLAMDatasetDownload, tyro.conf.subcommand()]
+Commands = Annotated[SLAMDatasetDownload, tyro.conf.subcommand()]
 
 
 def main(dataset: DatasetDownload, ):

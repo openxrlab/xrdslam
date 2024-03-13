@@ -12,8 +12,8 @@ import torch
 import tyro
 from tqdm import tqdm
 
-from deepslam.configs.base_config import PrintableConfig
 from scripts.utils.viz_utils import SLAMFrontend
+from slam.configs.base_config import PrintableConfig
 
 
 @dataclass

@@ -41,7 +41,7 @@ cd third_party
 bash install.sh
 ```
 
-Replace the filename in `deepslam/models/sparse_voxel.py` with the built library, like:
+Replace the filename in `slam/models/sparse_voxel.py` with the built library, like:
 
 ``` python
 torch.classes.load_library("third_party/sparse_octforest/build/lib.linux-x86_64-cpython-310/forest.cpython-310-x86_64-linux-gnu.so")
@@ -167,7 +167,7 @@ Here are the comparison results on **Replica** datasets. The results of the orig
 
 The methods with _X suffix are the corresponding methods in the XRDSLAM framework. For details, please see [Benchmark](docs/Benchmark.md)
 
-Note: The default configuration in the algorithm is suitable for Replica. If you use other datasets, you need to modify the corresponding configuration items in deepslam/configs/input_config.py.
+Note: The default configuration in the algorithm is suitable for Replica. If you use other datasets, you need to modify the corresponding configuration items in slam/configs/input_config.py.
 
 | Method       | ATE RMSE [cm] -     | PSNR+ | SSIM+ | LPIPS- | Precision [%] + | Recall [%] + | F1[%] + | Depth L1[cm] - | Acc. [cm]-     | Comp. [cm]-    | Comp. Ratio [<5cm %] + |
 | ------------ | ------------------- | ----- | ----- | ------ | --------------- | ------------ | ------- | -------------- | -------------- | -------------- | ---------------------- |
