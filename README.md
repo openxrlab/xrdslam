@@ -157,7 +157,7 @@ usage: ds-eval [-h] --output-dir PATH --gt-mesh {None}|STR
 
 ### 4. Adding your own method
 
-The figure below is the algorithm pipeline. When adding a new **deepslam** method, you need to register the method in **input_config.py** and re-inherit and implement the functions in the **Method** and **Model** classes. For details, please see [Adding a New Method ](docs/Adding_a_New_Method.md)
+The figure below is the algorithm pipeline. When adding a new **deepslam** method, you need to register the method in **input_config.py** and re-inherit and implement the functions in the **Algorithm** and **Model** classes. For details, please see [Adding a New Algorithm ](docs/Adding_a_New_Algorithm.md)
 
 ![pipeline](docs/imgs/pipeline.png)
 
@@ -169,7 +169,7 @@ The methods with _X suffix are the corresponding methods in the XRDSLAM framewor
 
 Note: The default configuration in the algorithm is suitable for Replica. If you use other datasets, you need to modify the corresponding configuration items in slam/configs/input_config.py.
 
-| Method       | ATE RMSE [cm] -     | PSNR+ | SSIM+ | LPIPS- | Precision [%] + | Recall [%] + | F1[%] + | Depth L1[cm] - | Acc. [cm]-     | Comp. [cm]-    | Comp. Ratio [<5cm %] + |
+| Algorithm       | ATE RMSE [cm] -     | PSNR+ | SSIM+ | LPIPS- | Precision [%] + | Recall [%] + | F1[%] + | Depth L1[cm] - | Acc. [cm]-     | Comp. [cm]-    | Comp. Ratio [<5cm %] + |
 | ------------ | ------------------- | ----- | ----- | ------ | --------------- | ------------ | ------- | -------------- | -------------- | -------------- | ---------------------- |
 | NICE-SLAM    | 1.06/2.50/1.13/1.95 | 24.42 | 0.81  | 0.23   | 44.10           | 43.69        | 43.86   | 3.53/2.97/1.90 | 2.85/2.37/3.87 | 3.00/2.64/3.87 | 89.33/91.13/82.41      |
 | NICE-SLAM_X  | 2.09                | 25.68 | 0.85  | 0.32   | 46.62           | 37.53        | 41.47   | 2.62           | 2.03           | 3.38           | 87.81                  |

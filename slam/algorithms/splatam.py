@@ -5,20 +5,20 @@ from typing import Type
 import numpy as np
 import torch
 
+from slam.algorithms.base_algorithm import Algorithm, AlgorithmConfig
 from slam.common.camera import Camera
 from slam.common.common import keyframe_selection_overlap, rgbd2pcd
-from slam.methods.base_method import Method, MethodConfig
 
 
 @dataclass
-class SplaTAMConfig(MethodConfig):
+class SplaTAMConfig(AlgorithmConfig):
     """SplaTAM  Config."""
     _target: Type = field(default_factory=lambda: SplaTAM)
     mapping_sil_thres: float = 0.5
     render_mode: str = 'color'  # ['color', 'depth' or 'centers']
 
 
-class SplaTAM(Method):
+class SplaTAM(Algorithm):
 
     config: SplaTAMConfig
 

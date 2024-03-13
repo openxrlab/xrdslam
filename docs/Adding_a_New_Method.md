@@ -1,6 +1,6 @@
 # Pipeline
 
-The figure below is the algorithm pipeline. When adding a new **deepslam** method, you need to register the method in **input_config.py** and re-inherit and implement the functions in the **Method** and **Model** classes.
+The figure below is the algorithm pipeline. When adding a new **deepslam** method, you need to register the method in **input_config.py** and re-inherit and implement the functions in the **Algorithm** and **Model** classes.
 
 ![img](./imgs/pipeline.png)
 
@@ -12,8 +12,8 @@ When adding a new deep-slam method, the recommended file structure is as follows
 ├── slam
 │   ├── configs
 │   │   └── input_config.py
-│   ├── methods
-│   │   ├── base_method.py
+│   ├── algorithms
+│   │   ├── base_algorithm.py
 │   │   ├── my_slam.py
 │   ├── models
 │   │   ├── base_model.py
@@ -23,26 +23,26 @@ When adding a new deep-slam method, the recommended file structure is as follows
 │   ├── ...
 ```
 
-# Inherit and implement BaseMethod
+# Inherit and implement BaseAlgorithm
 
-First create slam/methods/my_slam.py:
+First create slam/algorithms/my_slam.py:
 
 ```python
-"""slam/methods/my_slam.py"""
+"""slam/algorithms/my_slam.py"""
 
 import functools
 from dataclasses import dataclass, field
 from typing import List, Type
 import torch
-from slam.methods.base_method import Method, MethodConfig
+from slam.algorithms.base_algorithm import Algorithm, AlgorithmConfig
 
 @dataclass
-class MySLAMConfig(MethodConfig):
-    """MyMethod  Config."""
+class MySLAMConfig(AlgorithmConfig):
+    """MyAlgorithm  Config."""
     _target: Type = field(default_factory=lambda: MySLAM)
     # method config params
 
-class MySLAM(Method):
+class MySLAM(Algorithm):
 
     config: MySLAMConfig
 
@@ -52,7 +52,7 @@ class MySLAM(Method):
         self.model = self.config.model.setup(camera=camera)
         self.model.to(device)
 
-    # inherit and implement the needed functions from Method
+    # inherit and implement the needed functions from Algorithm
     def get_model_input(self, optimize_frames, is_mapping):
         pass
     def get_loss(self, optimize_frames, is_mapping, step=None, n_iters=None, coarse=False):
@@ -105,7 +105,7 @@ class MyModel(Model):
 ```python
 """slam/configs/input_config.py"""
 
-from slam.methods.my_slam import MySLAMConfig
+from slam.algorithms.my_slam import MySLAMConfig
 from slam.models.my_model import MyModelConfig
 
 descriptions = {

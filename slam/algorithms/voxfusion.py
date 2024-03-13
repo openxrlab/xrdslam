@@ -7,15 +7,15 @@ import torch
 import trimesh
 from skimage.measure import marching_cubes
 
+from slam.algorithms.base_algorithm import Algorithm, AlgorithmConfig
 from slam.common.camera import Camera
 from slam.common.common import get_rays, get_samples
-from slam.methods.base_method import Method, MethodConfig
 from slam.model_components.voxel_helpers_voxfusion import (eval_points,
                                                            get_scores)
 
 
 @dataclass
-class VoxFusionConfig(MethodConfig):
+class VoxFusionConfig(AlgorithmConfig):
     """VoxFusion  Config."""
     _target: Type = field(default_factory=lambda: VoxFusion)
 
@@ -27,7 +27,7 @@ class VoxFusionConfig(MethodConfig):
     ray_batch_size: int = 3000
 
 
-class VoxFusion(Method):
+class VoxFusion(Algorithm):
     def __init__(self, config: VoxFusionConfig, camera: Camera,
                  device: str) -> None:
         super().__init__(config, camera, device)

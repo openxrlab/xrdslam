@@ -7,9 +7,9 @@ import torch
 import torch.multiprocessing
 import torch.multiprocessing as mp
 
+from slam.algorithms.base_algorithm import AlgorithmConfig
 from slam.common.datasets import get_dataset
 from slam.configs.base_config import InstantiateConfig
-from slam.methods.base_method import MethodConfig
 from slam.pipeline.mapper import MapperConfig
 from slam.pipeline.tracker import TrackerConfig
 from slam.pipeline.visualizer import VisualizerConfig
@@ -28,7 +28,7 @@ class XRDSLAMConfig(InstantiateConfig):
 
     tracker: TrackerConfig = TrackerConfig()
     mapper: MapperConfig = MapperConfig()
-    method: MethodConfig = MethodConfig()
+    method: AlgorithmConfig = AlgorithmConfig()
     enable_vis: bool = True
     visualizer: VisualizerConfig = VisualizerConfig()
 
@@ -42,15 +42,15 @@ class XRDSLAM():
         self.dataset = get_dataset(config.data, self.config.data_type,
                                    self.config.device)
         self.camera = self.dataset.get_camera()
-        # ShareMethod
+        # ShareAlgorithm
         mp.set_start_method('spawn', force=True)
-        # Use a BaseManager to create a shared Method instance
+        # Use a BaseManager to create a shared Algorithm instance
         manager = BaseManager()
-        manager.register('ShareMethod', self.config.method._target)
+        manager.register('ShareAlgorithm', self.config.method._target)
         manager.start()
-        self.method = manager.ShareMethod(config=self.config.method,
-                                          camera=self.camera,
-                                          device=self.config.device)
+        self.method = manager.ShareAlgorithm(config=self.config.method,
+                                             camera=self.camera,
+                                             device=self.config.device)
 
         # mapframe buffer
         self.map_buffer = mp.Queue(maxsize=1)

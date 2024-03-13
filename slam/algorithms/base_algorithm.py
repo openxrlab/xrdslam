@@ -14,9 +14,9 @@ from slam.models.base_model import ModelConfig
 
 
 @dataclass
-class MethodConfig(InstantiateConfig):
-    """Method  Config."""
-    _target: Type = field(default_factory=lambda: Method)
+class AlgorithmConfig(InstantiateConfig):
+    """Algorithm  Config."""
+    _target: Type = field(default_factory=lambda: Algorithm)
     model: ModelConfig = ModelConfig()
     keyframe_selection_method: str = 'overlap'
     keyframe_use_ray_sample: bool = True
@@ -41,8 +41,8 @@ class MethodConfig(InstantiateConfig):
     })
 
 
-class Method():
-    def __init__(self, config: MethodConfig, camera: Camera,
+class Algorithm():
+    def __init__(self, config: AlgorithmConfig, camera: Camera,
                  device: str) -> None:
         self.config = config
         self.camera = camera

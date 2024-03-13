@@ -4,7 +4,7 @@ Here are the detailed comparison results on Replica.
 
 # ATE
 
-| Method\ATE(RMSE[cm]) | Room0     | Room1     | Room2     | Office0   | Office1   | Office2   | Office3   | Office4   | Average   |
+| Algorithm\ATE(RMSE[cm]) | Room0     | Room1     | Room2     | Office0   | Office1   | Office2   | Office3   | Office4   | Average   |
 | -------------------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- |
 | NICE-SLAM            | 0.97/1.69 | 1.31/2.04 | 1.07/1.55 | 0.88/0.99 | 1.00/0.90 | 1.06/1.39 | 1.10/3.97 | 1.13/3.08 | 1.06/1.95 |
 | NICE-SLAM_X          | 2.38      | 1.78      | 2.38      | 1.82      | 0.71      | 1.97      | 3.45      | 2.29      | 2.09      |
@@ -21,7 +21,7 @@ Here are the detailed comparison results on Replica.
 
 A single Replica dataset has a total of 2000 frames, rendering is performed every 50 frames, a total of 40 images are rendered. Calculate the 2D metrics of these rendered images and get the average results.
 
-| Method       | Metric | Room0 | Room1 | Room2 | Office0 | Office1 | Office2 | Office3 | Office4 | Average |
+| Algorithm       | Metric | Room0 | Room1 | Room2 | Office0 | Office1 | Office2 | Office3 | Office4 | Average |
 | ------------ | ------ | ----- | ----- | ----- | ------- | ------- | ------- | ------- | ------- | ------- |
 | NICE-SLAM    | PSNR+  | 22.12 | 22.47 | 24.52 | 29.07   | 30.34   | 19.66   | 22.23   | 24.94   | 24.42   |
 |              | SSIM+  | 0.69  | 0.76  | 0.81  | 0.87    | 0.89    | 0.80    | 0.80    | 0.86    | 0.81    |
@@ -56,7 +56,7 @@ A single Replica dataset has a total of 2000 frames, rendering is performed ever
 
 # 3D metrics
 
-| Method       | Metric                | Room0 | Room1 | Room2 | Office0 | Office1 | Office2 | Office3 | Office4 | Average |
+| Algorithm       | Metric                | Room0 | Room1 | Room2 | Office0 | Office1 | Office2 | Office3 | Office4 | Average |
 | ------------ | --------------------- | ----- | ----- | ----- | ------- | ------- | ------- | ------- | ------- | ------- |
 | NICE-SLAM    | Depth L1[cm] -        | 1.81  | 1.44  | 2.04  | 1.39    | 1.76    | 8.33    | 4.99    | 2.01    | 2.97    |
 |              | Precision [%] +       | 45.86 | 43.76 | 44.38 | 51.40   | 50.80   | 38.37   | 40.85   | 37.35   | 44.10   |

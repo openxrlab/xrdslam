@@ -6,16 +6,16 @@ from typing import List, Type
 import numpy as np
 import torch
 
+from slam.algorithms.base_algorithm import Algorithm, AlgorithmConfig
 from slam.common.camera import Camera
 from slam.common.common import get_rays, get_samples
 from slam.common.mesher import MesherConfig
 from slam.engine.optimizers import Optimizers
-from slam.methods.base_method import Method, MethodConfig
 from slam.utils.utils import get_camera_rays
 
 
 @dataclass
-class CoSLAMConfig(MethodConfig):
+class CoSLAMConfig(AlgorithmConfig):
     """CoSLAM  Config."""
     _target: Type = field(default_factory=lambda: CoSLAM)
     # mesher
@@ -38,7 +38,7 @@ class CoSLAMConfig(MethodConfig):
         default_factory=lambda: [[-3.5, 3], [-3, 3], [-3, 3]])
 
 
-class CoSLAM(Method):
+class CoSLAM(Algorithm):
     def __init__(self, config: CoSLAMConfig, camera: Camera,
                  device: str) -> None:
         super().__init__(config, camera, device)

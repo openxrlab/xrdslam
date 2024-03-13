@@ -10,15 +10,15 @@ from scipy.interpolate import interp1d
 from skimage import filters
 from skimage.color import rgb2gray
 
+from slam.algorithms.base_algorithm import Algorithm, AlgorithmConfig
 from slam.common.camera import Camera
 from slam.common.common import (clean_mesh, get_mesh_from_RGBD, get_rays,
                                 get_samples, get_samples_with_pixel_grad)
-from slam.methods.base_method import Method, MethodConfig
 from slam.models.conv_onet2 import ConvOnet2Config
 
 
 @dataclass
-class PointSLAMConfig(MethodConfig):
+class PointSLAMConfig(AlgorithmConfig):
     """PointSLAM  Config."""
     _target: Type = field(default_factory=lambda: PointSLAM)
 
@@ -59,7 +59,7 @@ class PointSLAMConfig(MethodConfig):
     clean_mesh: bool = True
 
 
-class PointSLAM(Method):
+class PointSLAM(Algorithm):
 
     config: PointSLAMConfig
     model_config: ConvOnet2Config

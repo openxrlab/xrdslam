@@ -5,14 +5,14 @@ from typing import List, Type
 import numpy as np
 import torch
 
+from slam.algorithms.base_algorithm import Algorithm, AlgorithmConfig
 from slam.common.camera import Camera
 from slam.common.common import get_rays, get_samples
 from slam.common.mesher import MesherConfig
-from slam.methods.base_method import Method, MethodConfig
 
 
 @dataclass
-class NiceSLAMConfig(MethodConfig):
+class NiceSLAMConfig(AlgorithmConfig):
     """NiceSLAM  Config."""
     _target: Type = field(default_factory=lambda: NiceSLAM)
 
@@ -44,7 +44,7 @@ class NiceSLAMConfig(MethodConfig):
     mapping_lr_first_factor: float = 5.0
 
 
-class NiceSLAM(Method):
+class NiceSLAM(Algorithm):
 
     config: NiceSLAMConfig
 
