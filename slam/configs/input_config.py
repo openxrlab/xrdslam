@@ -8,7 +8,6 @@ from typing import Dict
 import tyro
 
 from slam.algorithms.coslam import CoSLAMConfig
-from slam.algorithms.my_slam import MySLAMConfig
 from slam.algorithms.nice_slam import NiceSLAMConfig
 from slam.algorithms.point_slam import PointSLAMConfig
 from slam.algorithms.splatam import SplaTAMConfig
@@ -22,7 +21,6 @@ from slam.models.conv_onet import ConvOnetConfig
 from slam.models.conv_onet2 import ConvOnet2Config
 from slam.models.gaussian_splatting import GaussianSplattingConfig
 from slam.models.joint_encoding import JointEncodingConfig
-from slam.models.my_model import MyModelConfig
 from slam.models.sparse_voxel import SparseVoxelConfig
 from slam.pipeline.mapper import MapperConfig
 from slam.pipeline.tracker import TrackerConfig
@@ -37,7 +35,6 @@ descriptions = {
     'co-slam': 'Implementation of co-slam.',
     'point-slam': 'Implementation of point-slam.',
     'splaTAM': 'Implementation of splaTAM.',
-    'my-slam': 'Implementation of MySLAM.',
 }
 
 algorithm_configs['nice-slam'] = XRDSLAMerConfig(
@@ -428,36 +425,6 @@ algorithm_configs['splaTAM'] = XRDSLAMerConfig(
         enable_vis=False,
         device='cuda:0')  # TODO: only support cuda:0 now
 )
-
-algorithm_configs['my-slam'] = XRDSLAMerConfig(
-    algorithm_name='my-slam',
-    xrdslam=XRDSLAMConfig(
-        tracker=TrackerConfig(map_every=5,
-                              render_freq=50,
-                              use_relative_pose=False,
-                              save_debug_result=False),
-        mapper=MapperConfig(keyframe_every=50, ),
-        algorithm=MySLAMConfig(
-            tracking_n_iters=10,
-            mapping_n_iters=60,
-            mapping_first_n_iters=1500,
-            mapping_window_size=5,
-            model=MyModelConfig(),
-            optimizers={
-                'model_params': {
-                    'optimizer': AdamOptimizerConfig(),
-                    'scheduler': None
-                },
-                'tracking_pose': {
-                    'optimizer': AdamOptimizerConfig(lr=1e-3),
-                    'scheduler': None,
-                },
-            },
-        ),
-        visualizer=VisualizerConfig(),
-        enable_vis=True,
-        device='cuda:0',
-    ))
 
 AnnotatedBaseConfigUnion = tyro.conf.SuppressFixed[
     # Don't show unparsable (fixed) arguments in helptext.
