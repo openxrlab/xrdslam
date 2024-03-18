@@ -14,7 +14,7 @@ from slam.algorithms.base_algorithm import Algorithm, AlgorithmConfig
 from slam.common.camera import Camera
 from slam.common.common import (clean_mesh, get_mesh_from_RGBD, get_rays,
                                 get_samples, get_samples_with_pixel_grad)
-from slam.models.conv_onet2 import ConvOnet2Config
+from slam.models.conv_onet_pointslam import ConvOnet2Config
 
 
 @dataclass

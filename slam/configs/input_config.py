@@ -18,7 +18,7 @@ from slam.engine.schedulers import (LRconfig, NiceSLAMSchedulerConfig,
                                     PointSLAMSchedulerConfig)
 from slam.engine.xrdslamer import XRDSLAMerConfig
 from slam.models.conv_onet import ConvOnetConfig
-from slam.models.conv_onet2 import ConvOnet2Config
+from slam.models.conv_onet_pointslam import ConvOnet2Config
 from slam.models.gaussian_splatting import GaussianSplattingConfig
 from slam.models.joint_encoding import JointEncodingConfig
 from slam.models.sparse_voxel import SparseVoxelConfig
