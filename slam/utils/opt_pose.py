@@ -74,6 +74,10 @@ class OptimizablePose(nn.Module):
     @staticmethod
     def axis_angle_to_rotation_matrix(angle_axis):
         angle = torch.norm(angle_axis, dim=-1, keepdim=True)
+        if torch.allclose(angle, torch.zeros_like(angle)):
+            return torch.eye(3,
+                             device=angle_axis.device,
+                             dtype=angle_axis.dtype)
         axis = angle_axis / angle
         w0, w1, w2 = axis.unbind(dim=-1)
         zeros = torch.zeros_like(w0)
