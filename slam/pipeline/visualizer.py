@@ -133,6 +133,9 @@ class Visualizer():
 
                 elif data[0] == 'img':
                     idx, gt_color, gt_depth, rcolor, rdepth = data[1:]
+                    if rcolor is None or rdepth is None:
+                        rcolor = np.zeros_like(gt_color)
+                        rdepth = np.zeros_like(gt_depth)
                     gt_color = np.clip(gt_color, 0, 1)
                     rcolor = np.clip(rcolor, 0, 1)
                     depth_residual = np.abs(gt_depth - rdepth)
