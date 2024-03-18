@@ -47,6 +47,7 @@ class MySLAM(Algorithm):
     def render_img(self, c2w, gt_depth=None, idx=None):
         return None, None
 
+    # Note: temporary use
     def optimize_update(self,
                         n_iters,
                         optimize_frames,

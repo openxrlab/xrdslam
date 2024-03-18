@@ -46,5 +46,4 @@ class MyModel(Model):
         pass
 
     def get_outputs(self, input) -> Dict[str, Union[torch.Tensor, List]]:
-        outputs = {}
-        return outputs
+        pass
