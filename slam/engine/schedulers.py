@@ -1,4 +1,3 @@
-# Copyright (c) OpenMMLab. All rights reserved.
 """Scheduler Classes."""
 
 from abc import abstractmethod

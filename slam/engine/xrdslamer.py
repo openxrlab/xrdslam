@@ -1,4 +1,3 @@
-# Copyright (c) OpenMMLab. All rights reserved.
 from __future__ import annotations
 
 from dataclasses import dataclass, field

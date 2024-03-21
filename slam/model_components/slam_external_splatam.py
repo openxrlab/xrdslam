@@ -1,4 +1,3 @@
-# Copyright (c) OpenMMLab. All rights reserved.
 from math import exp
 
 import numpy as np
