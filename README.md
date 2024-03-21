@@ -151,7 +151,7 @@ usage: ds-eval [-h] --output-dir PATH --gt-mesh {None}|STR
 
 ### 4. Adding your own algorithm
 
-The figure below is the algorithm pipeline. When adding a new **deepslam** algorithm, you need to register the algorithm in **input_config.py** and re-inherit and implement the functions in the **Algorithm** and **Model** classes. For details, please see [Adding a New Algorithm ](docs/Adding_a_New_Algorithm.md)
+The figure below is the algorithm pipeline. When adding a new **deepslam** algorithm, you need to register the algorithm in **input_config.py** and re-inherit and implement the functions in the **Algorithm** and **Model** classes. For details, please see [adding_a_new_algorithm ](docs/adding_a_new_algorithm.md)
 
 ![pipeline](docs/imgs/pipeline.png)
 
@@ -159,7 +159,7 @@ The figure below is the algorithm pipeline. When adding a new **deepslam** algor
 
 Here are the comparison results on **Replica** datasets. The results of the original algorithm comes from multiple papers.
 
-The algorithms with _X suffix are the corresponding algorithms in the XRDSLAM framework. For details, please see [Benchmark](docs/Benchmark.md)
+The algorithms with _X suffix are the corresponding algorithms in the XRDSLAM framework. For details, please see [benchmark](docs/benchmark.md)
 
 Note: The default configuration in the algorithm is suitable for Replica. If you use other datasets, you need to modify the corresponding configuration items in slam/configs/input_config.py.
 
