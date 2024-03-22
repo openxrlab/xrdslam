@@ -58,7 +58,7 @@ ds-run co-slam --data  data/replica/Replica/office0  --data-type replica
 # [2] run co-slam with online visualizer
 ds-run co-slam --data  data/replica/Replica/office0  --data-type replica  --xrdslam.enable-vis True  --xrdslam.tracker.render-freq  5
 # [3] eval co-slam
- ds-eval  --output-dir  ./outputs --gt-mesh  ./data/replica/cull_replica_mesh/office0.ply
+ds-eval  --output-dir  ./outputs --gt-mesh  ./data/replica/cull_replica_mesh/office0.ply
 # [4] use offline viewer
 ds-viewer --config.vis-dir  ./outputs/
 ```
@@ -179,10 +179,7 @@ Note: The default configuration in the algorithm is suitable for Replica. If you
 ## License
 
 The license for our codebase is under the [Apache-2.0](LICENSE).
-
-We've developed a flexible framework to seamlessly integrate various DeepSLAM algorithms. Each algorithm's fundamental code is directly sourced from its original implementation.
-
-It's important to note that utilizing both external dependencies and the fundamental code from their original sources might impact our codebase's licensing.
+Please note that this license only applies to the code in our library, the dependencies of which are separate and individually licensed. In the source code files, we have made specific licensing declarations for the third-party code being used. We would like to pay tribute to open-source implementations to which we rely on. Please be aware that utilizing both external dependencies and the fundamental code from their original sources might impact our codebase's licensing.
 
 ## Acknowledgement
 
