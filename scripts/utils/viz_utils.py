@@ -15,7 +15,7 @@ def normalize(x):
     return x / np.linalg.norm(x)
 
 
-def create_camera_actor(i, is_gt=False, scale=0.005):
+def create_camera_actor(is_gt=False, scale=0.005):
     cam_points = scale * np.array([[0, 0, 0], [-1, -1, 1.5], [1, -1, 1.5],
                                    [1, 1, 1.5], [-1, 1, 1.5], [-0.5, 1, 1.5],
                                    [0.5, 1, 1.5], [0, 1.2, 1.5]])
@@ -79,7 +79,7 @@ def draw_trajectory(queue, output, init_pose, cam_scale, save_rendering, near,
                             vis.update_geometry(pc)
 
                     else:
-                        cam_actor = create_camera_actor(i, is_gt, cam_scale)
+                        cam_actor = create_camera_actor(is_gt, cam_scale)
                         cam_actor.transform(pose)
                         vis.add_geometry(cam_actor)
 
