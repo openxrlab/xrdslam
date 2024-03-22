@@ -1,3 +1,6 @@
+# This file is based on code from point-slam,
+# licensed under the Apache License, Version 2.0.
+
 import math
 
 import torch

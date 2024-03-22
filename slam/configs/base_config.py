@@ -1,3 +1,5 @@
+# This file is based on code from nerf-studio,
+# licensed under the Apache License, Version 2.0.
 """Base Configs."""
 
 from __future__ import annotations

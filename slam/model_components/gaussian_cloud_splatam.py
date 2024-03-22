@@ -1,4 +1,6 @@
-# Package imports
+# This file is modified from splaTAM,
+# licensed under the BSD 3-Clause License.
+
 import numpy as np
 import torch
 import torch.nn as nn

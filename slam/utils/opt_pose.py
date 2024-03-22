@@ -1,3 +1,6 @@
+# Modified from Voxfusion
+# (https://github.com/zju3dv/Vox-Fusion/blob/main/src/se3pose.py).
+
 from copy import deepcopy
 
 import torch

@@ -1,3 +1,7 @@
+# This file is based on code from Nice-slam,
+# (https://github.com/cvg/nice-slam/blob/master/src/tools/eval_recon.py)
+# licensed under the Apache License, Version 2.0.
+
 import argparse
 import random
 

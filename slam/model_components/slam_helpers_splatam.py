@@ -1,3 +1,6 @@
+# This file is modified from splaTAM, 
+# licensed under the BSD 3-Clause License.
+
 import torch
 import torch.nn.functional as F
 

@@ -337,6 +337,8 @@ class PointSLAM(Algorithm):
             return cloud_pos, cloud_rgb / 255.0
 
     def cal_dynamic_radius(self, gt_color_np):
+        """This function is modified from point-slam, licensed under the Apache
+        License, Version 2.0."""
         ratio = self.config.pointcloud_radius_query_ratio
         intensity = rgb2gray(gt_color_np)
         grad_y = filters.sobel_h(intensity)
@@ -364,7 +366,9 @@ class PointSLAM(Algorithm):
         return dynamic_r_add, dynamic_r_query
 
     def get_mask_from_c2w(self, c2w, depth_np):
-        """
+        """This function is modified from point-slam, licensed under the Apache
+        License, Version 2.0.
+
         Frustum feature selection based on current camera pose and depth image.
         Args:
             c2w (tensor): camera pose of current frame.

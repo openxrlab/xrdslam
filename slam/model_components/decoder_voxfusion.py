@@ -1,3 +1,6 @@
+# This file is based on code from vox-fusion.
+# (https://github.com/zju3dv/Vox-Fusion/blob/main/src/variations/nrgbd.py)
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

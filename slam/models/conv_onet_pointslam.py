@@ -226,8 +226,11 @@ class ConvOnet2(Model):
             use_view_direction=self.config.model_use_view_direction)
 
     def load_pretrain(self):
-        """Load parameters of pretrained ConvOnet checkpoints to the
-        decoders."""
+        """This function is modified from point-slam, licensed under the Apache
+        License, Version 2.0.
+
+        Load parameters of pretrained ConvOnet checkpoints to the decoders.
+        """
         ckpt = torch.load(self.config.pretrained_decoders_middle_fine,
                           map_location=self.device)
         middle_dict = {}
@@ -250,7 +253,10 @@ class ConvOnet2(Model):
                     ray_pts_num=None,
                     dynamic_r_query=None,
                     exposure_feat=None):
-        """Evaluates the occupancy and/or color value for the points.
+        """This function is modified from point-slam, licensed under the Apache
+        License, Version 2.0.
+
+        Evaluates the occupancy and/or color value for the points.
 
         Args:
             p (tensor, N*3): Point coordinates.
@@ -310,7 +316,9 @@ class ConvOnet2(Model):
                          is_tracker=True,
                          dynamic_r_query=None,
                          exposure_feat=None):
-        '''
+        """This function is modified from point-slam, licensed under the Apache
+        License, Version 2.0.
+
         Params:
             rays_o: [N_rays, 3]
             rays_d: [N_rays, 3]
@@ -323,7 +331,7 @@ class ConvOnet2(Model):
             (can be interpreted as epistemic uncertainty)
             color (tensor): rendered color.
             valid_ray_mask (tensor): filter corner cases.
-        '''
+        """
         N_rays = rays_o.shape[0]
         if gt_depth is not None:
             # per ray far rendering distance for pixels that have no depth

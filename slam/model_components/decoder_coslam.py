@@ -1,4 +1,6 @@
-# Package imports
+# This file is based on code from co-slam,
+# licensed under the Apache License, Version 2.0.
+
 import tinycudann as tcnn
 import torch
 import torch.nn as nn

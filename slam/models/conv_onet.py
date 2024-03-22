@@ -182,7 +182,10 @@ class ConvOnet(Model):
 
     # only used by mesher
     def query_fn(self, pi):
-        """Evaluates the occupancy value for the points.
+        """This function is modified from nice-slam, licensed under the Apache
+        License, Version 2.0.
+
+        Evaluates the occupancy value for the points.
 
         Args:
             p (tensor, N*3): point coordinates.
@@ -258,8 +261,11 @@ class ConvOnet(Model):
                                              std=0.01)
 
     def load_pretrain(self):
-        """Load parameters of pretrained ConvOnet checkpoints to the
-        decoders."""
+        """This function is modified from nice-slam, licensed under the Apache
+        License, Version 2.0.
+
+        Load parameters of pretrained ConvOnet checkpoints to the decoders.
+        """
         if self.config.coarse:
             ckpt = torch.load(self.config.pretrained_decoders_coarse,
                               map_location=self.device)
@@ -301,7 +307,10 @@ class ConvOnet(Model):
                 self.config.model_coarse_bound_enlarge
 
     def eval_points(self, p, stage='color'):
-        """Evaluates the occupancy and/or color value for the points.
+        """This function is modified from nice-slam, licensed under the Apache
+        License, Version 2.0.
+
+        Evaluates the occupancy and/or color value for the points.
 
         Args:
             p (tensor, N*3): Point coordinates.
@@ -336,7 +345,9 @@ class ConvOnet(Model):
         return ret
 
     def render_batch_ray(self, rays_o, rays_d, stage, gt_depth=None):
-        '''
+        """This function is modified from nice-slam, licensed under the Apache
+        License, Version 2.0.
+
         Params:
             rays_o: [N_rays, 3]
             rays_d: [N_rays, 3]
@@ -346,7 +357,7 @@ class ConvOnet(Model):
             depth (tensor): rendered depth.
             uncertainty (tensor): rendered uncertainty.
             color (tensor): rendered color.
-        '''
+        """
         N_samples = self.config.rendering_n_samples
         N_surface = self.config.rendering_n_surface
         N_importance = self.config.rendering_n_importance

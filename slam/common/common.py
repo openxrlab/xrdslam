@@ -14,7 +14,9 @@ from torchmetrics.image.lpip import LearnedPerceptualImagePatchSimilarity
 
 
 def normalize_3d_coordinate(p, bound):
-    """Normalize 3d coordinate to [-1, 1] range.
+    """Copy from nice-slam, licensed under the Apache License, Version 2.0.
+
+    Normalize 3d coordinate to [-1, 1] range.
 
     Args:
         p: (N, 3) 3d coordinate
@@ -35,7 +37,10 @@ def random_select(num, k):
 
 
 def get_rays_from_uv(i, j, c2w, fx, fy, cx, cy, device):
-    """Get corresponding rays from input uv."""
+    """Copy from nice-slam, licensed under the Apache License, Version 2.0.
+
+    Get corresponding rays from input uv.
+    """
     if isinstance(c2w, np.ndarray):
         c2w = torch.from_numpy(c2w).to(device)
     dirs = torch.stack([(i - cx) / fx, -(j - cy) / fy, -torch.ones_like(i)],
@@ -49,7 +54,10 @@ def get_rays_from_uv(i, j, c2w, fx, fy, cx, cy, device):
 
 
 def select_uv(i, j, n, depth, color, device='cuda:0'):
-    """Select n uv from dense uv."""
+    """Copy from nice-slam, licensed under the Apache License, Version 2.0.
+
+    Select n uv from dense uv.
+    """
     i = i.reshape(-1)
     j = j.reshape(-1)
     indices = torch.randint(i.shape[0], (n, ), device=device)
@@ -64,7 +72,8 @@ def select_uv(i, j, n, depth, color, device='cuda:0'):
 
 
 def get_sample_uv_with_grad(H0, H1, W0, W1, n, image, ratio=15):
-    """
+    """Copy from Point-slam, licensed under the Apache License, Version 2.0.
+
     Sample n uv coordinates from an image region H0..H1, W0..W1
     image (numpy.ndarray): color image or estimated normal image
     Args:
@@ -98,7 +107,10 @@ def get_sample_uv_with_grad(H0, H1, W0, W1, n, image, ratio=15):
 
 
 def get_sample_uv(H0, H1, W0, W1, n, depth, color, device='cuda:0'):
-    """Sample n uv coordinates from an image region H0..H1, W0..W1."""
+    """Copy from nice-slam, licensed under the Apache License, Version 2.0.
+
+    Sample n uv coordinates from an image region H0..H1, W0..W1.
+    """
     depth = depth[H0:H1, W0:W1]
     color = color[H0:H1, W0:W1]
     i, j = torch.meshgrid(torch.linspace(W0, W1 - 1, W1 - W0).to(device),
@@ -119,7 +131,9 @@ def get_selected_index_with_grad(H0,
                                  ratio=15,
                                  gt_depth=None,
                                  depth_limit=False):
-    """return uv coordinates with top color gradient from an image region
+    """Copy from Point-slam, licensed under the Apache License, Version 2.0.
+
+    return uv coordinates with top color gradient from an image region
     H0..H1, W0..W1.
 
     Args:
@@ -182,7 +196,9 @@ def get_samples(camera,
                 depth_filter=False,
                 return_index=False,
                 depth_limit=None):
-    """Get n rays from the image region 0..H, 0..W.
+    """Copy from nice-slam, licensed under the Apache License, Version 2.0.
+
+    Get n rays from the image region 0..H, 0..W.
 
     c2w is its camera pose and depth/color is the corresponding image tensor.
     """
@@ -222,7 +238,9 @@ def get_samples_with_pixel_grad(camera,
                                 depth_filter=True,
                                 return_index=True,
                                 depth_limit=None):
-    """Get n rays from the image region H0..H1, W0..W1 based on color
+    """Copy from Point-slam, licensed under the Apache License, Version 2.0.
+
+    Get n rays from the image region H0..H1, W0..W1 based on color
     gradients, normal map gradients and random selection H, W: height, width.
 
     fx, fy, cx, cy: intrinsics. c2w is its camera pose and depth/color is the
@@ -268,7 +286,10 @@ def get_samples_with_pixel_grad(camera,
 
 
 def get_rays(camera, c2w, device):
-    """Get rays for a whole image."""
+    """Copy from nice-slam, licensed under the Apache License, Version 2.0.
+
+    Get rays for a whole image.
+    """
     if isinstance(c2w, np.ndarray):
         c2w = torch.from_numpy(c2w).to(device)
     # pytorch's meshgrid has indexing='ij'
@@ -289,55 +310,9 @@ def get_rays(camera, c2w, device):
     return rays_o, rays_d
 
 
-# NeuralRGBD
-def getVoxels(x_max,
-              x_min,
-              y_max,
-              y_min,
-              z_max,
-              z_min,
-              voxel_size=None,
-              resolution=None):
-
-    if not isinstance(x_max, float):
-        x_max = float(x_max)
-        x_min = float(x_min)
-        y_max = float(y_max)
-        y_min = float(y_min)
-        z_max = float(z_max)
-        z_min = float(z_min)
-
-    if voxel_size is not None:
-        Nx = round((x_max - x_min) / voxel_size + 0.0005)
-        Ny = round((y_max - y_min) / voxel_size + 0.0005)
-        Nz = round((z_max - z_min) / voxel_size + 0.0005)
-
-        tx = torch.linspace(x_min, x_max, Nx + 1)
-        ty = torch.linspace(y_min, y_max, Ny + 1)
-        tz = torch.linspace(z_min, z_max, Nz + 1)
-    else:
-        tx = torch.linspace(x_min, x_max, resolution)
-        ty = torch.linspace(y_min, y_max, resolution)
-        tz = torch.linspace(z_min, z_max, resolution)
-
-    return tx, ty, tz
-
-
-def get_batch_query_fn(query_fn, num_args=1, device=None):
-    def fn_single(f, i0, i1):
-        return query_fn(f[i0:i1, None, :].to(device))
-
-    def fn_multiple(f, f1, i0, i1):
-        return query_fn(f[i0:i1, None, :].to(device), f1[i0:i1, :].to(device))
-
-    if num_args == 1:
-        return fn_single
-    else:
-        return fn_multiple
-
-
-# be used for keyframe_selection_overlap
 def get_pointcloud(depth, camera, c2w, sampled_indices):
+    """This function is modified from splaTAM, licensed under the BSD 3-Clause
+    License."""
     fx, fy, cx, cy = (camera.fx, camera.fy, camera.cx, camera.cy)
 
     # Compute indices of sampled pixels
@@ -532,6 +507,8 @@ def save_render_imgs(idx, gt_color_np, gt_depth_np, color_np, depth_np,
 
 
 def rgbd2pcd(color_np, depth_np, c2w_np, camera, render_mode, device):
+    """This function is modified from splaTAM, licensed under the BSD 3-Clause
+    License."""
     color_np = np.clip(color_np, 0, 1.0)
     color = torch.from_numpy(color_np).to(device)  # render image [H, W, C]
     depth = torch.from_numpy(depth_np).to(device)  #
@@ -577,6 +554,8 @@ def rgbd2pcd(color_np, depth_np, c2w_np, camera, render_mode, device):
 
 
 def setup_camera(camera, w2c, near=0.01, far=100):
+    """This function is modified from splaTAM, licensed under the BSD 3-Clause
+    License."""
     w, h, fx, fy, cx, cy = (camera.width, camera.height, camera.fx, camera.fy,
                             camera.cx, camera.cy)
     w2c = torch.tensor(w2c).cuda().float()
@@ -604,8 +583,9 @@ def setup_camera(camera, w2c, near=0.01, far=100):
     return cam
 
 
-# for point-slam
 def get_mesh_from_RGBD(camera, keyframe_graph, scale=1):
+    """Modified from point-slam, licensed under the Apache License, Version
+    2.0."""
     H, W, fx, fy, cx, cy = (camera.height, camera.width, camera.fx, camera.fy,
                             camera.cx, camera.cy)
     if version.parse(o3d.__version__) >= version.parse('0.13.0'):
@@ -647,8 +627,9 @@ def get_mesh_from_RGBD(camera, keyframe_graph, scale=1):
     return o3d_mesh
 
 
-# for point-slam
 def clean_mesh(mesh):
+    """Modified from point-slam, licensed under the Apache License, Version
+    2.0."""
     mesh_tri = trimesh.Trimesh(vertices=np.asarray(mesh.vertices),
                                faces=np.asarray(mesh.triangles),
                                vertex_colors=np.asarray(mesh.vertex_colors))
@@ -700,6 +681,8 @@ def cull_mesh(dataset,
               eval_rec=False,
               truncation=0.06,
               device='cuda:0'):
+    """Modified from co-slam, licensed under the Apache License, Version
+    2.0."""
 
     if estimate_c2w_list is not None:
         n_imgs = len(estimate_c2w_list)

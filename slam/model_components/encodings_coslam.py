@@ -1,3 +1,6 @@
+# This file is based on code from co-slam,
+# licensed under the Apache License, Version 2.0.
+
 import numpy as np
 import tinycudann as tcnn
 import torch

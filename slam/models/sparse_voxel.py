@@ -158,11 +158,12 @@ class SparseVoxel(Model):
         return outputs
 
     def render_rays(self, rays_o, rays_d, target_d=None, chunk_size=-1):
-        '''
+        """This function is modified from voxfusion,
+
         intersections -> sample feature -> decoder
         rays_o: # [1, N, 3], need , dim 0 = 1, for voxel operation
         rays_d: # [1, N, 3]
-        '''
+        """
         map_states = self.map_states
         centres = map_states['voxel_center_xyz']  # [1, N_1, 3]
         children = map_states['voxel_structure']
@@ -273,7 +274,9 @@ class SparseVoxel(Model):
         return ret
 
     def sdf2weights(self, sdf, z_vals, valid_mask):
-        """Convert signed distance function to weights.
+        """This function is modified from voxfusion,
+
+        Convert signed distance function to weights.
 
         Params:
             sdf: [N_rays, N_samples]
@@ -334,6 +337,7 @@ class SparseVoxel(Model):
 
     @torch.enable_grad()
     def update_map_states(self):
+        """This function is modified from voxfusion."""
         voxels, children, features, leaf_num = self.octree.get_all()
         centres = (voxels[:, :3] + voxels[:, -1:] / 2) * self.config.voxel_size
         children = torch.cat([children, voxels[:, -1:]], -1)

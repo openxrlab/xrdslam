@@ -163,7 +163,11 @@ class JointEncoding(Model):
         return outputs
 
     def smoothness(self, sample_points=256, voxel_size=0.1, margin=0.05):
-        """Smoothness loss of feature grid."""
+        """This function is modified from co-slam, licensed under the Apache
+        License, Version 2.0.
+
+        Smoothness loss of feature grid.
+        """
         volume = self.bounding_box[:, 1] - self.bounding_box[:, 0]
 
         grid_size = (sample_points - 1) * voxel_size
@@ -206,7 +210,11 @@ class JointEncoding(Model):
             self.resolution_color = int(dim_max / self.config.voxel_color)
 
     def get_encoding(self):
-        """Get the encoding of the scene representation."""
+        """This function is modified from co-slam, licensed under the Apache
+        License, Version 2.0.
+
+        Get the encoding of the scene representation.
+        """
         # Coordinate encoding
         self.embedpos_fn, self.input_ch_pos = get_encoder(
             self.config.pos_enc, n_bins=self.config.pos_nbins)
@@ -240,13 +248,14 @@ class JointEncoding(Model):
         self.sdf_net = batchify(self.decoder.sdf_net, None)
 
     def render_rays(self, rays_o, rays_d, target_d=None):
-        '''
+        """This function is modified from co-slam, licensed under the Apache
+        License, Version 2.0.
+
         Params:
             rays_o: [N_rays, 3]
             rays_d: [N_rays, 3]
             target_d: [N_rays, 1]
-
-        '''
+        """
 
         n_rays = rays_o.shape[0]
 
@@ -335,7 +344,10 @@ class JointEncoding(Model):
         return ret
 
     def sdf2weights(self, sdf, z_vals):
-        """Convert signed distance function to weights.
+        """This function is modified from co-slam, licensed under the Apache
+        License, Version 2.0.
+
+        Convert signed distance function to weights.
 
         Params:
             sdf: [N_rays, N_samples]
@@ -362,7 +374,10 @@ class JointEncoding(Model):
         return weights / (torch.sum(weights, axis=-1, keepdims=True) + 1e-8)
 
     def raw2outputs(self, raw, z_vals, white_bkgd=False):
-        """Perform volume rendering using weights computed from sdf.
+        """This function is modified from co-slam, licensed under the Apache
+        License, Version 2.0.
+
+        Perform volume rendering using weights computed from sdf.
 
         Params:
             raw: [N_rays, N_samples, 4]
@@ -409,14 +424,16 @@ class JointEncoding(Model):
         return self.query_color(pi)
 
     def query_sdf(self, query_points, return_geo=False, embed=False):
-        '''
+        """This function is modified from co-slam, licensed under the Apache
+        License, Version 2.0.
+
         Get the SDF value of the query points
         Params:
             query_points: [N_rays, N_samples, 3]
         Returns:
             sdf: [N_rays, N_samples]
             geo_feat: [N_rays, N_samples, channel]
-        '''
+        """
         inputs_flat = torch.reshape(query_points, [-1, query_points.shape[-1]])
 
         embedded = self.embed_fn(inputs_flat)
@@ -439,10 +456,15 @@ class JointEncoding(Model):
         return sdf, geo_feat
 
     def query_color(self, query_points):
+        """This function is modified from co-slam, licensed under the Apache
+        License, Version 2.0."""
         return torch.sigmoid(self.query_color_sdf(query_points)[..., :3])
 
     def query_color_sdf(self, query_points):
-        """Query the color and sdf at query_points.
+        """This function is modified from co-slam, licensed under the Apache
+        License, Version 2.0.
+
+        Query the color and sdf at query_points.
 
         Params:
             query_points: [N_rays, N_samples, 3]
@@ -459,7 +481,10 @@ class JointEncoding(Model):
         return self.decoder(embed, embe_pos)
 
     def run_network(self, inputs):
-        """Run the network on a batch of inputs.
+        """This function is modified from co-slam, licensed under the Apache
+        License, Version 2.0.
+
+        Run the network on a batch of inputs.
 
         Params:
             inputs: [N_rays, N_samples, 3]
@@ -482,7 +507,10 @@ class JointEncoding(Model):
         return outputs
 
     def render_surface_color(self, rays_o, normal):
-        """Render the surface color of the points.
+        """This function is modified from co-slam, licensed under the Apache
+        License, Version 2.0.
+
+        Render the surface color of the points.
 
         Params:
             points: [N_rays, 1, 3]

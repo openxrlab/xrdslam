@@ -4,16 +4,12 @@ import torch
 import torch.nn.functional as F
 
 
-def mse2psnr(x):
-    """MSE to PSNR."""
-    return -10. * torch.log(x) / torch.log(torch.Tensor([10.])).to(x)
-
-
 def coordinates(voxel_dim, device: torch.device, flatten=True):
-    '''
+    """Code from co-slam, licensed under the Apache License, Version 2.0.
+
     Params: voxel_dim: int or tuple of int
     Return: coordinates of the voxel grid
-    '''
+    """
     if type(voxel_dim) is int:
         nx = ny = nz = voxel_dim
     else:
@@ -30,14 +26,15 @@ def coordinates(voxel_dim, device: torch.device, flatten=True):
 
 
 def sample_pdf(bins, weights, N_importance, det=False, eps=1e-5):
-    '''
+    """Code from co-slam, licensed under the Apache License, Version 2.0.
+
     Params:
         bins: torch.Tensor, (Bs, N_samples)
         weights: torch.Tensor, (Bs, N_samples)
         N_importance: int
     Return:
         samples: torch.Tensor, (Bs, N_importance)
-    '''
+    """
     # device = weights.get_device()
     device = weights.device
     # Get pdf
@@ -77,7 +74,10 @@ def sample_pdf(bins, weights, N_importance, det=False, eps=1e-5):
 
 
 def batchify(fn, chunk=1024 * 64):
-    """Constructs a version of 'fn' that applies to smaller batches."""
+    """Code from co-slam, licensed under the Apache License, Version 2.0.
+
+    Constructs a version of 'fn' that applies to smaller batches.
+    """
     if chunk is None:
         return fn
 
@@ -95,7 +95,8 @@ def batchify(fn, chunk=1024 * 64):
 
 
 def get_masks(z_vals, target_d, truncation):
-    '''
+    """Code from co-slam, licensed under the Apache License, Version 2.0.
+
     Params:
         z_vals: torch.Tensor, (Bs, N_samples)
         target_d: torch.Tensor, (Bs,)
@@ -105,7 +106,7 @@ def get_masks(z_vals, target_d, truncation):
         sdf_mask: torch.Tensor, (Bs, N_samples)
         fs_weight: float
         sdf_weight: float
-    '''
+    """
 
     # before truncation
     front_mask = torch.where(z_vals < (target_d - truncation),
@@ -129,14 +130,15 @@ def get_masks(z_vals, target_d, truncation):
 
 
 def compute_loss(prediction, target, loss_type='l2'):
-    '''
+    """Code from co-slam, licensed under the Apache License, Version 2.0.
+
     Params:
         prediction: torch.Tensor, (Bs, N_samples)
         target: torch.Tensor, (Bs, N_samples)
         loss_type: str
     Return:
         loss: torch.Tensor, (1,)
-    '''
+    """
 
     if loss_type == 'l2':
         return F.mse_loss(prediction, target)
@@ -152,7 +154,8 @@ def get_sdf_loss(z_vals,
                  truncation,
                  loss_type=None,
                  grad=None):
-    '''
+    """Code from co-slam, licensed under the Apache License, Version 2.0.
+
     Params:
         z_vals: torch.Tensor, (Bs, N_samples)
         target_d: torch.Tensor, (Bs,)
@@ -162,7 +165,7 @@ def get_sdf_loss(z_vals,
         fs_loss: torch.Tensor, (1,)
         sdf_loss: torch.Tensor, (1,)
         eikonal_loss: torch.Tensor, (1,)
-    '''
+    """
     front_mask, sdf_mask, fs_weight, sdf_weight = get_masks(
         z_vals, target_d, truncation)
 
@@ -186,7 +189,9 @@ def raw2outputs_nerf_color(raw,
                            occupancy=False,
                            device='cuda:0',
                            coef=10.0):
-    """Transforms model's predictions to semantically meaningful values.
+    """Code from nice-slam, licensed under the Apache License, Version 2.0.
+
+    Transforms model's predictions to semantically meaningful values.
 
     Args:
         raw (tensor, N_rays*N_samples*4): prediction from model.
@@ -237,7 +242,9 @@ def raw2outputs_nerf_color(raw,
 
 
 def raw2outputs_nerf_color2(raw, z_vals, rays_d, device='cuda:0', coef=0.1):
-    """Transforms model's predictions to semantically meaningful values.
+    """Code from point-slam, licensed under the Apache License, Version 2.0.
+
+    Transforms model's predictions to semantically meaningful values.
 
     Args:
         raw (tensor, (N_rays,N_samples,4) ): prediction from model. i.e.
@@ -286,7 +293,8 @@ def raw2outputs_nerf_color2(raw, z_vals, rays_d, device='cuda:0', coef=0.1):
 
 
 def get_mask_from_c2w(camera, bound, c2w, key, val_shape, depth_np):
-    """Frustum feature selection based on current camera pose and depth image.
+    """Code from nice-slam, licensed under the Apache License, Version 2.0.
+    Frustum feature selection based on current camera pose and depth image.
 
     Args:
         c2w (tensor): camera pose of current frame.

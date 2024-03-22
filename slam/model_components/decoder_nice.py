@@ -1,3 +1,6 @@
+# This file is based on code from nice-slam,
+# licensed under the Apache License, Version 2.0.
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

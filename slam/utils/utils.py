@@ -1,3 +1,6 @@
+# This function is modified from co-slam,
+# licensed under the Apache License, Version 2.0.
+
 import re
 
 import numpy as np
