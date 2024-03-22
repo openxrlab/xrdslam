@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import argparse
-
 import yaml
 
 
@@ -52,12 +50,3 @@ def update_recursive(dict1, dict2):
             update_recursive(dict1[k], v)
         else:
             dict1[k] = v
-
-
-def convert_to_namespace(dict_in, args=None):
-    if args is None:
-        args = argparse.Namespace()
-    for ckey, cvalue in dict_in.items():
-        if ckey not in args.__dict__.keys():
-            args.__dict__[ckey] = cvalue
-    return args
