@@ -2,9 +2,9 @@
 
 ## Introduction
 
-OpenXRLab Visual-inertial DeepSLAM Toolbox and Benchmark. It is a part of the OpenXRLab project.
+OpenXRLab Deep-learning based SLAM Toolbox and Benchmark. It is a part of the OpenXRLab project.
 
-We provide a set of pre implemented xrdslam algorithms.
+We provide a set of pre-implemented deep-learning based SLAM algorithms.
 
 | Replica/office0                                              |                                                              |                                                              |                                                              |                                                              |
 | :----------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -151,7 +151,7 @@ usage: ds-eval [-h] --output-dir PATH --gt-mesh {None}|STR
 
 ### 4. Adding your own algorithm
 
-The figure below is the algorithm pipeline. When adding a new **deepslam** algorithm, you need to register the algorithm in **input_config.py** and re-inherit and implement the functions in the **Algorithm** and **Model** classes. For details, please see [adding_a_new_algorithm ](docs/adding_a_new_algorithm.md)
+The figure below is the algorithm pipeline. When adding a new deep-learning based SLAM algorithm, you need to register the algorithm in **input_config.py** and re-inherit and implement the functions in the **Algorithm** and **Model** classes. For details, please see [adding_a_new_algorithm ](docs/adding_a_new_algorithm.md)
 
 ![pipeline](docs/imgs/pipeline.png)
 
@@ -210,7 +210,7 @@ If you use this toolbox or benchmark in your research, please cite this project.
 
 ```bibtex
 @misc{xrdslam,
-    title={OpenXRLab DeepSLAM Toolbox and Benchmark},
+    title={OpenXRLab Deep-learning based SLAM Toolbox and Benchmark},
     author={XRDSLAM Contributors},
     howpublished = {\url{https://github.com/openxrlab/xrdslam}},
     year={2024}
@@ -221,7 +221,7 @@ If you use this toolbox or benchmark in your research, please cite this project.
 
 - [XRPrimer](https://github.com/openxrlab/xrprimer): OpenXRLab foundational library for XR-related algorithms.
 - [XRSLAM](https://github.com/openxrlab/xrslam): OpenXRLab Visual-inertial SLAM Toolbox and Benchmark.
-- [XRDSLAM](https://github.com/openxrlab/xrdslam): OpenXRLab DeepSLAM Toolbox and Benchmark.
+- [XRDSLAM](https://github.com/openxrlab/xrdslam): OpenXRLab Deep-learning based SLAM Toolbox and Benchmark.
 - [XRSfM](https://github.com/openxrlab/xrsfm): OpenXRLab Structure-from-Motion Toolbox and Benchmark.
 - [XRLocalization](https://github.com/openxrlab/xrlocalization): OpenXRLab Visual Localization Toolbox and Server.
 - [XRMoCap](https://github.com/openxrlab/xrmocap): OpenXRLab Multi-view Motion Capture Toolbox and Benchmark.
