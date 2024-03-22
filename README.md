@@ -178,7 +178,11 @@ Note: The default configuration in the algorithm is suitable for Replica. If you
 
 ## License
 
-The license of our codebase is [Apache-2.0](LICENSE). Note that this license only applies to code in our library, the dependencies of which are separate and individually licensed. We would like to pay tribute to open-source implementations to which we rely on. Please be aware that using the content of dependencies may affect the license of our codebase.
+The license for our codebase is under the [Apache-2.0](LICENSE).
+
+We've developed a flexible framework to seamlessly integrate various DeepSLAM algorithms. Each algorithm's fundamental code is directly sourced from its original implementation.
+
+It's important to note that utilizing both external dependencies and the fundamental code from their original sources might impact our codebase's licensing.
 
 ## Acknowledgement
 
