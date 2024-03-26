@@ -1,4 +1,17 @@
-# XRDSLAM
+
+<br/>
+
+<div align="center">
+    <img src="docs/imgs/XRDSLAM.png" width="600"/>
+</div>
+<br/>
+
+<div align="left">
+<div align="left">
+
+[![Lint](https://github.com/openxrlab/xrdslam/actions/workflows/lint.yml/badge.svg)](https://github.com/openxrlab/xrdslam/actions/workflows/lint.yml) [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/openxrlab/xrdslam/blob/master/LICENSE)
+
+</div>
 
 ## Introduction
 
