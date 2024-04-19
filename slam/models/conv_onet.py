@@ -95,17 +95,16 @@ class ConvOnet(Model):
             gt_depth_np = cur_frame.depth
             c2w = cur_frame.get_pose()
             for key, grid in self.grid_c.items():
-                if key != 'grid_coarse':
-                    mask = get_mask_from_c2w(camera=self.camera,
-                                             bound=self.bounding_box,
-                                             c2w=c2w,
-                                             key=key,
-                                             val_shape=grid.val.shape[2:],
-                                             depth_np=gt_depth_np)
-                    mask = torch.from_numpy(mask).permute(
-                        2, 1, 0).unsqueeze(0).unsqueeze(0).repeat(
-                            1, grid.val.shape[1], 1, 1, 1)
-                    self.grid_opti_mask[key] = mask
+                mask = get_mask_from_c2w(camera=self.camera,
+                                         bound=self.bounding_box,
+                                         c2w=c2w,
+                                         key=key,
+                                         val_shape=grid.val.shape[2:],
+                                         depth_np=gt_depth_np)
+                mask = torch.from_numpy(mask).permute(
+                    2, 1, 0).unsqueeze(0).unsqueeze(0).repeat(
+                        1, grid.val.shape[1], 1, 1, 1)
+                self.grid_opti_mask[key] = mask
 
     def get_outputs(self, input) -> Dict[str, Union[torch.Tensor, List]]:
         rays_o = input['rays_o']
