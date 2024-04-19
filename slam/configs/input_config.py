@@ -159,12 +159,12 @@ algorithm_configs['vox-fusion'] = XRDSLAMerConfig(
                               use_relative_pose=True,
                               save_debug_result=False,
                               init_pose_offset=10),
-        mapper=MapperConfig(keyframe_every=10, ),
+        mapper=MapperConfig(keyframe_every=50, ),
         algorithm=VoxFusionConfig(
-            # keyframe_selection_algorithm='random',
+            keyframe_selection_method='random',
             tracking_n_iters=30,
             mapping_n_iters=15,  # 30
-            mapping_first_n_iters=100,
+            mapping_first_n_iters=30,
             mapping_window_size=5,
             mapping_sample=1024,
             tracking_sample=1024,

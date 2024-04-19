@@ -43,6 +43,8 @@ class NiceSLAMConfig(AlgorithmConfig):
     mapping_lr_factor: float = 1.0
     mapping_lr_first_factor: float = 5.0
 
+    mapping_color_refine: bool = True
+
 
 class NiceSLAM(Algorithm):
 
@@ -66,6 +68,47 @@ class NiceSLAM(Algorithm):
             marching_cubes_bound=self.marching_cube_bound)
 
         self.cur_mesh = None
+
+    def do_mapping(self, cur_frame):
+        if not self.is_initialized():
+            mapping_n_iters = self.config.mapping_first_n_iters
+        else:
+            mapping_n_iters = self.config.mapping_n_iters
+
+        # here provides a color refinement postprocess
+        if cur_frame.is_final_frame and self.config.mapping_color_refine:
+            outer_joint_iters = 5
+            self.config.mapping_window_size *= 2
+            self.config.mapping_middle_iter_ratio = 0.0
+            self.config.mapping_fine_iter_ratio = 0.0
+            self.model.config.mapping_fix_color = True
+            self.model.config.mapping_frustum_feature_selection = False
+        else:
+            outer_joint_iters = 1
+
+        for _ in range(outer_joint_iters):
+            # select optimize frames
+            with torch.no_grad():
+                optimize_frames = self.select_optimize_frames(
+                    cur_frame,
+                    keyframe_selection_method=self.config.
+                    keyframe_selection_method)
+            # optimize keyframes_pose, model_params, update model params
+            self.optimize_update(mapping_n_iters,
+                                 optimize_frames,
+                                 is_mapping=True,
+                                 coarse=False)
+
+        # do coarse_mapper
+        optimize_frames = self.select_optimize_frames(
+            cur_frame, keyframe_selection_method='random')
+        self.optimize_update(mapping_n_iters,
+                             optimize_frames,
+                             is_mapping=True,
+                             coarse=True)
+
+        if not self.is_initialized():
+            self.set_initialized()
 
     def optimizer_config_update(self, max_iters, coarse=False):
         if len(self.keyframe_graph) > 4 and not coarse:

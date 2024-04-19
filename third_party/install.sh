@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd ./sparse_octforest/
+cd ./sparse_octree/
 python setup.py install
 
 cd ../sparse_voxels/

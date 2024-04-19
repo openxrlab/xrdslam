@@ -169,12 +169,12 @@ class ConvOnet(Model):
             decoders_para_list += list(self.decoder.fine_decoder.parameters())
         if not self.config.mapping_fix_color:
             decoders_para_list += list(self.decoder.color_decoder.parameters())
-        param_groups['decoder'] = decoders_para_list
+        if len(decoders_para_list) > 0:
+            param_groups['decoder'] = decoders_para_list
         # grid_params
         for key, grid in self.grid_c.items():
             grid = grid.to(self.device)
-            if (self.config.mapping_frustum_feature_selection
-                    and not self.config.coarse):
+            if self.config.mapping_frustum_feature_selection:
                 mask = self.grid_opti_mask[key]
                 grid.set_mask(mask)
             param_groups[key] = list(grid.parameters())

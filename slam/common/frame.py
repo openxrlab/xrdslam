@@ -24,6 +24,7 @@ class Frame(nn.Module):
         self.gt_pose = gt_pose
         self.separate_LR = separate_LR
         self.rot_rep = rot_rep
+        self.is_final_frame = False
 
         if init_pose is not None:
             pose = torch.tensor(init_pose,

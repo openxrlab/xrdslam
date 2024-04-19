@@ -179,7 +179,7 @@ class VoxFusion(Algorithm):
     @torch.no_grad()
     def extract_mesh(self, res=8, clean_mesh=False, require_color=False):
         # get map states
-        voxels, _, features, leaf_num = self.model.octree.get_all()
+        voxels, _, features = self.model.svo.get_centres_and_children()
         index = features.eq(-1).any(-1)
         voxels = voxels[~index, :]
         features = features[~index, :]

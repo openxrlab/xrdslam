@@ -290,7 +290,10 @@ class Tracker():
         else:
             map_every = self.config.map_every
         # send to mapper
-        if check_frame.fid % map_every == 0:
+        if check_frame.fid % map_every == 0 or check_frame.fid == len(
+                self.dataset) - 1:
+            check_frame.is_final_frame = (
+                check_frame.fid == len(self.dataset) - 1)
             map_buffer.put(check_frame, block=True)
             return True
         return False

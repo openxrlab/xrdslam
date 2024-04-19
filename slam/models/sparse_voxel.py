@@ -29,7 +29,7 @@ def find_so_files(directory):
 
 
 search_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                '../../third_party/sparse_octforest/build/')
+                                '../../third_party/sparse_octree/build/')
 so_files = find_so_files(search_directory)
 for so_file in so_files:
     torch.classes.load_library(so_file)
@@ -304,7 +304,8 @@ class SparseVoxel(Model):
                           1e-8), z_min
 
     def get_octree(self):
-        self.octree = torch.classes.forest.Octree(self.config.voxels_each_dim)
+        self.svo = torch.classes.svo.Octree()
+        self.svo.init(256, self.config.embed_dim, self.config.voxel_size)
         self.embeddings = torch.nn.Parameter(torch.zeros(
             (self.config.num_embeddings, self.config.embed_dim),
             dtype=torch.float32,
@@ -327,18 +328,13 @@ class SparseVoxel(Model):
         voxels = torch.div(points,
                            self.config.voxel_size,
                            rounding_mode='floor')
-        voxels = torch.unique(voxels.cpu().int(), sorted=False, dim=0)
-        # here, voxels.cpu().int() and (voxels.cpu().int()[:, None]).view(-1,3)
-        # has the same shape: [N_points, 3]
-        # i think we can remove repeated voxel ids to reduce insert time and
-        # torch loading time for svo.
-        self.octree.insert(voxels)
+        self.svo.insert(voxels.cpu().int())
         self.update_map_states()
 
     @torch.enable_grad()
     def update_map_states(self):
         """This function is modified from voxfusion."""
-        voxels, children, features, leaf_num = self.octree.get_all()
+        voxels, children, features = self.svo.get_centres_and_children()
         centres = (voxels[:, :3] + voxels[:, -1:] / 2) * self.config.voxel_size
         children = torch.cat([children, voxels[:, -1:]], -1)
 
