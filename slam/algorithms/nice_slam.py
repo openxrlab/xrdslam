@@ -222,6 +222,8 @@ class NiceSLAM(Algorithm):
                  n_iters,
                  coarse=False):
         self.set_stage(is_mapping, step, n_iters, coarse=coarse)
+        if is_mapping:
+            self.model.grid_processing(coarse=coarse)
         model_input = self.get_model_input(optimize_frames, is_mapping)
         model_outputs = self.model(model_input)
         loss_dict = self.model.get_loss_dict(model_outputs, model_input,
