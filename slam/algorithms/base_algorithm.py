@@ -75,7 +75,7 @@ class Algorithm():
         pass
 
     @abstractmethod
-    def post_processing(self, step, is_mapping, optimizer=None):
+    def post_processing(self, step, is_mapping, optimizer=None, coarse=False):
         pass
 
     @abstractmethod
@@ -232,16 +232,6 @@ class Algorithm():
                              is_mapping=True,
                              coarse=False)
 
-        # only for nice-slam
-        if self.config.coarse:
-            # do coarse_mapper
-            optimize_frames = self.select_optimize_frames(
-                cur_frame, keyframe_selection_method='random')
-            self.optimize_update(mapping_n_iters,
-                                 optimize_frames,
-                                 is_mapping=True,
-                                 coarse=True)
-
         if not self.is_initialized():
             self.set_initialized()
 
@@ -274,7 +264,10 @@ class Algorithm():
                     ).clone().cpu().numpy()
                 loss.backward(
                     retain_graph=(self.config.retain_graph and is_mapping))
-                self.post_processing(step, is_mapping, optimizers.optimizers)
+                self.post_processing(step,
+                                     is_mapping,
+                                     optimizers.optimizers,
+                                     coarse=coarse)
                 optimizers.optimizer_step_all(step=step)
                 optimizers.scheduler_step_all()
             # return best c2w by min_loss

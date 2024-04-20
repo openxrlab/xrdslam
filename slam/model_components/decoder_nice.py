@@ -207,17 +207,14 @@ class MLP(nn.Module):
     def forward(self, p, c_grid=None):
         if self.c_dim != 0:
             c = self.sample_grid_feature(
-                p,
-                c_grid['grid_' + self.name].val_mask()).transpose(1,
-                                                                  2).squeeze(0)
+                p, c_grid['grid_' + self.name]).transpose(1, 2).squeeze(0)
 
             if self.concat_feature:
                 # only happen to fine decoder, get feature from middle
                 # level and concat to the current feature
                 with torch.no_grad():
                     c_middle = self.sample_grid_feature(
-                        p, c_grid['grid_middle'].val_mask()).transpose(
-                            1, 2).squeeze(0)
+                        p, c_grid['grid_middle']).transpose(1, 2).squeeze(0)
                 c = torch.cat([c, c_middle], dim=1)
 
         p = p.float()
@@ -309,9 +306,8 @@ class MLP_no_xyz(nn.Module):
         return c
 
     def forward(self, p, c_grid, **kwargs):
-        c = self.sample_grid_feature(
-            p, c_grid['grid_' + self.name].val_mask()).transpose(1,
-                                                                 2).squeeze(0)
+        c = self.sample_grid_feature(p, c_grid['grid_' + self.name]).transpose(
+            1, 2).squeeze(0)
         h = c
         for i, l in enumerate(self.pts_linears):
             h = self.pts_linears[i](h)

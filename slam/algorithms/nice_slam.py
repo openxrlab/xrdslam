@@ -100,12 +100,13 @@ class NiceSLAM(Algorithm):
                                  coarse=False)
 
         # do coarse_mapper
-        optimize_frames = self.select_optimize_frames(
-            cur_frame, keyframe_selection_method='random')
-        self.optimize_update(mapping_n_iters,
-                             optimize_frames,
-                             is_mapping=True,
-                             coarse=True)
+        if self.config.coarse:
+            optimize_frames = self.select_optimize_frames(
+                cur_frame, keyframe_selection_method='random')
+            self.optimize_update(mapping_n_iters,
+                                 optimize_frames,
+                                 is_mapping=True,
+                                 coarse=True)
 
         if not self.is_initialized():
             self.set_initialized()
@@ -132,6 +133,10 @@ class NiceSLAM(Algorithm):
     def pre_precessing(self, cur_frame, is_mapping):
         if is_mapping:
             self.model.pre_precessing(cur_frame)
+
+    def post_processing(self, step, is_mapping, optimizer=None, coarse=False):
+        if is_mapping:
+            self.model.post_processing(coarse)
 
     def get_model_input(self, optimize_frames, is_mapping):
         batch_rays_d_list = []

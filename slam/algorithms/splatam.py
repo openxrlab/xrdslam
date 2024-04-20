@@ -82,7 +82,7 @@ class SplaTAM(Algorithm):
         if is_mapping:
             self.model.model_update(cur_frame)
 
-    def post_processing(self, step, is_mapping, optimizer=None):
+    def post_processing(self, step, is_mapping, optimizer=None, coarse=False):
         if is_mapping:
             self.model.post_processing(step, optimizer)
 

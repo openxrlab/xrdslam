@@ -89,21 +89,44 @@ class ConvOnet(Model):
         self.load_pretrain()
         self.grid_init()
         self.grid_opti_mask = {}
+        self.masked_c_grad = {}
+
+    def post_processing(self, coarse):
+        if self.config.mapping_frustum_feature_selection:
+            for key, val in self.grid_c.items():
+                if (coarse and key == 'grid_coarse') or (not coarse and
+                                                         key != 'grid_coarse'):
+                    val_grad = self.masked_c_grad[key]
+                    mask = self.masked_c_grad[key + 'mask']
+                    val = val.detach()
+                    val[mask] = val_grad.clone().detach()
+                    self.grid_c[key] = val
+
+    def grid_processing(self, coarse):
+        if self.config.mapping_frustum_feature_selection:
+            for key, val in self.grid_c.items():
+                if (coarse and key == 'grid_coarse') or (not coarse and
+                                                         key != 'grid_coarse'):
+                    val_grad = self.masked_c_grad[key]
+                    mask = self.masked_c_grad[key + 'mask']
+                    val = val.to(self.device)
+                    val[mask] = val_grad
+                    self.grid_c[key] = val
 
     def pre_precessing(self, cur_frame):
         if self.config.mapping_frustum_feature_selection:
             gt_depth_np = cur_frame.depth
             c2w = cur_frame.get_pose()
-            for key, grid in self.grid_c.items():
+            for key, val in self.grid_c.items():
                 mask = get_mask_from_c2w(camera=self.camera,
                                          bound=self.bounding_box,
                                          c2w=c2w,
                                          key=key,
-                                         val_shape=grid.val.shape[2:],
+                                         val_shape=val.shape[2:],
                                          depth_np=gt_depth_np)
                 mask = torch.from_numpy(mask).permute(
                     2, 1, 0).unsqueeze(0).unsqueeze(0).repeat(
-                        1, grid.val.shape[1], 1, 1, 1)
+                        1, val.shape[1], 1, 1, 1)
                 self.grid_opti_mask[key] = mask
 
     def get_outputs(self, input) -> Dict[str, Union[torch.Tensor, List]]:
@@ -171,12 +194,20 @@ class ConvOnet(Model):
         if len(decoders_para_list) > 0:
             param_groups['decoder'] = decoders_para_list
         # grid_params
-        for key, grid in self.grid_c.items():
-            grid = grid.to(self.device)
+        for key, val in self.grid_c.items():
             if self.config.mapping_frustum_feature_selection:
+                val = val.to(self.device)
                 mask = self.grid_opti_mask[key]
-                grid.set_mask(mask)
-            param_groups[key] = list(grid.parameters())
+                val_grad = val[mask].clone()
+                val_grad = torch.nn.Parameter(val_grad.to(self.device))
+                self.masked_c_grad[key] = val_grad
+                self.masked_c_grad[key + 'mask'] = mask
+                param_groups[key] = [val_grad]
+            else:
+                val = torch.nn.Parameter(val.to(self.device))
+                self.grid_c[key] = val
+                param_groups[key] = [val]
+
         return param_groups
 
     # only used by mesher
@@ -239,25 +270,25 @@ class ConvOnet(Model):
                 xyz_len=xyz_len * self.config.model_coarse_bound_enlarge,
                 grid_len=coarse_grid_len,
                 c_dim=c_dim,
-                std=0.01)
+                std=0.01).val
 
         middle_key = 'grid_middle'
         self.grid_c[middle_key] = FeatureGrid(xyz_len=xyz_len,
                                               grid_len=middle_grid_len,
                                               c_dim=c_dim,
-                                              std=0.01)
+                                              std=0.01).val
 
         fine_key = 'grid_fine'
         self.grid_c[fine_key] = FeatureGrid(xyz_len=xyz_len,
                                             grid_len=fine_grid_len,
                                             c_dim=c_dim,
-                                            std=0.0001)
+                                            std=0.0001).val
 
         color_key = 'grid_color'
         self.grid_c[color_key] = FeatureGrid(xyz_len=xyz_len,
                                              grid_len=color_grid_len,
                                              c_dim=c_dim,
-                                             std=0.01)
+                                             std=0.01).val
 
     def load_pretrain(self):
         """This function is modified from nice-slam, licensed under the Apache
