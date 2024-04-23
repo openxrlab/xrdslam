@@ -1,8 +1,12 @@
 # Benchmark
 
+# Replica
+
 Here are the detailed comparison results on Replica.
 
-# ATE
+## ATE
+
+Note: DPVO run with monocular data and requires scale correction during trajectory alignment.
 
 | Algorithm\ATE(RMSE[cm]) | Room0     | Room1     | Room2     | Office0   | Office1   | Office2   | Office3   | Office4   | Average   |
 | -------------------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- |
@@ -16,8 +20,9 @@ Here are the detailed comparison results on Replica.
 | Point-SLAM_X         | 0.50      | 0.44      | 0.37      | 0.32      | 0.50      | 0.55      | 0.65      | 0.49      | 0.47      |
 | SplaTAM              | 0.31      | 0.40      | 0.29      | 0.47      | 0.27      | 0.29      | 0.32      | 0.55      | 0.36      |
 | SplaTAM_X            | 0.39      | 0.27      | 0.27      | 0.47      | 0.30      | 0.39      | 0.48      | 0.63      | 0.40      |
+| DPVO_X | 0.28 | 0.31 | 0.19 | 0.37 | 0.15 | 0.32 | 0.25 | 0.58 | 0.31 |
 
-# 2D metrics
+## 2D metrics
 
 A single Replica dataset has a total of 2000 frames, rendering is performed every 50 frames, a total of 40 images are rendered. Calculate the 2D metrics of these rendered images and get the average results.
 
@@ -54,7 +59,7 @@ A single Replica dataset has a total of 2000 frames, rendering is performed ever
 |              | SSIM+  | 0.97  | 0.96  | 0.98  | 0.98    | 0.98    | 0.96    | 0.95    | 0.94    | 0.96    |
 |              | LPIPS- | 0.07  | 0.10  | 0.07  | 0.08    | 0.10    | 0.10    | 0.11    | 0.16    | 0.09    |
 
-# 3D metrics
+## 3D metrics
 
 | Algorithm       | Metric                | Room0 | Room1 | Room2 | Office0 | Office1 | Office2 | Office3 | Office4 | Average |
 | ------------ | --------------------- | ----- | ----- | ----- | ------- | ------- | ------- | ------- | ------- | ------- |
@@ -109,3 +114,14 @@ A single Replica dataset has a total of 2000 frames, rendering is performed ever
 |              | Acc. [cm]-            | 1.45  | 1.14  | 1.20  | 1.04    | 0.85    | 1.32    | 1.56    | 1.48    | 1.25    |
 |              | Comp. [cm]-           | 3.62  | 3.07  | 3.01  | 1.69    | 2.37    | 3.66    | 3.53    | 4.02    | 3.12    |
 |              | Comp. Ratio[<5cm %] + | 87.60 | 89.13 | 89.43 | 93.00   | 89.42   | 85.85   | 85.56   | 85.23   | 88.15   |
+
+# Euroc
+
+## ATE
+
+Note: DPVO run with monocular data and requires scale correction during trajectory alignment.
+
+| Algorithm\ATE(RMSE[cm]) | MH01 | MH02 | MH03 | MH04 | MH05 | V101 | V102 | V103 | V201 | V202 | V203 | Average |
+| ----------------------- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ------- |
+| DPVO                    | 8.7  | 5.5  | 15.8 | 13.7 | 11.4 | 5.0  | 14.0 | 8.6  | 5.7  | 4.9  | 21.1 | 10.5    |
+| DPVO_X                  | 10.0 | 7.4  | 11.8 | 15.2 | 8.7  | 9.4  | 15.9 | 10.2 | 6.6  | 6.4  | 12.3 | 10.4    |

@@ -161,6 +161,10 @@ usage: ds-eval [-h] --output-dir PATH --gt-mesh {None}|STR
 
   Path to ground-truth mesh file. (required)
 
+- --correct-scale
+
+  Correct scale or not.
+
 ### 4. Adding your own algorithm
 
 The figure below is the algorithm pipeline. When adding a new deep-learning based SLAM algorithm, you need to register the algorithm in **input_config.py** and re-inherit and implement the functions in the **Algorithm** and **Model** classes. For details, please see [adding_a_new_algorithm ](docs/adding_a_new_algorithm.md)
@@ -187,7 +191,7 @@ Note: The default configuration in the algorithm is suitable for Replica. If you
 | Point-SLAM_X | 0.47                | 34.10 | 0.97  | 0.10   | 99.30           | 83.78        | 90.86   | 0.38           | 1.25           | 3.12           | 88.15                  |
 | SplaTAM      | 0.36                | 34.11 | 0.97  | 0.10   | -               | -            | -       | -              | -              | -              | -                      |
 | SplaTAM_X    | 0.40                | 34.44 | 0.96  | 0.09   | -               | -            | -       | -              | -              | -              | -                      |
-| DPVO_X | 0.36 | - | - | - | - | - | - | - | - | - | - |
+| DPVO_X | 0.31 | - | - | - | - | - | - | - | - | - | - |
 
 ## License
 
