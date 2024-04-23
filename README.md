@@ -144,7 +144,7 @@ usage: ds-viewer [-h] [--config.vis-dir PATH] [--config.save-rendering {True,Fal
 
 - --config.algorithm-name
 
-  NOTE: When use splaTAM, algorithm name should be set. (default: None)
+  NOTE: When use splaTAM or DPVO, algorithm name should be set. (default: None)
 
 #### ds-eval
 
@@ -166,7 +166,7 @@ usage: ds-eval [-h] --output-dir PATH --gt-mesh {None}|STR
 
 - --correct-scale
 
-  Correct scale or not.
+  NOTE: When evaluating the trajectory of DPVO, "--correct-scale" should be used.
 
 ### 4. Adding your own algorithm
 
