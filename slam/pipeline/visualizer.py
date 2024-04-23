@@ -111,31 +111,39 @@ class Visualizer():
                         rdepth = np.zeros_like(gt_depth)
                     gt_color = np.clip(gt_color, 0, 1)
                     rcolor = np.clip(rcolor, 0, 1)
-                    depth_residual = np.abs(gt_depth - rdepth)
-                    depth_residual[gt_depth == 0.0] = 0.0
                     color_residual = np.abs(gt_color - rcolor)
-                    color_residual[gt_depth == 0.0] = 0.0
+                    if gt_depth is not None:
+                        depth_residual = np.abs(gt_depth - rdepth)
+                        depth_residual[gt_depth == 0.0] = 0.0
+                        color_residual[gt_depth == 0.0] = 0.0
+                        max_depth = np.max(gt_depth)
                     color_residual = np.clip(color_residual, 0, 1)
-                    max_depth = np.max(gt_depth)
-                    self.depth_plot = self.ax_depth.imshow(gt_depth,
-                                                           cmap='plasma',
-                                                           vmin=0,
-                                                           vmax=max_depth)
-                    self.rdepth_plot = self.ax_rdepth.imshow(rdepth,
-                                                             cmap='plasma',
-                                                             vmin=0,
-                                                             vmax=max_depth)
-                    self.depth_diff_plot = self.ax_depth_diff.imshow(
-                        depth_residual, cmap='plasma', vmin=0, vmax=max_depth)
+                    if gt_depth is not None:
+                        self.depth_plot = self.ax_depth.imshow(gt_depth,
+                                                               cmap='plasma',
+                                                               vmin=0,
+                                                               vmax=max_depth)
+                        self.rdepth_plot = self.ax_rdepth.imshow(
+                            rdepth, cmap='plasma', vmin=0, vmax=max_depth)
+                        self.depth_diff_plot = self.ax_depth_diff.imshow(
+                            depth_residual,
+                            cmap='plasma',
+                            vmin=0,
+                            vmax=max_depth)
                     self.color_plot.set_array(gt_color)
                     self.rcolor_plot.set_array(rcolor)
                     self.color_diff_plot.set_array(color_residual)
                     # 2d metrics
                     # rgb
-                    depth_mask = (torch.from_numpy(
-                        gt_depth > 0).unsqueeze(-1)).float()
-                    gt_color = torch.tensor(gt_color) * depth_mask
-                    rcolor = torch.tensor(rcolor) * depth_mask
+                    if gt_depth is not None:
+                        depth_mask = (torch.from_numpy(
+                            gt_depth > 0).unsqueeze(-1)).float()
+                        gt_color = torch.tensor(gt_color) * depth_mask
+                        rcolor = torch.tensor(rcolor) * depth_mask
+                    else:
+                        gt_color = torch.tensor(gt_color)
+                        rcolor = torch.tensor(rcolor)
+
                     mse_loss = torch.nn.functional.mse_loss(gt_color, rcolor)
                     psnr = -10. * torch.log10(mse_loss)
                     ssim = ms_ssim(gt_color.transpose(0,
@@ -151,11 +159,14 @@ class Visualizer():
                                                       2).float()).item()
 
                     # depth
-                    gt_depth = torch.tensor(gt_depth)
-                    rdepth = torch.tensor(rdepth)
-                    depth_l1_render = torch.abs(
-                        gt_depth[gt_depth > 0] -
-                        rdepth[gt_depth > 0]).mean().item() * 100
+                    if gt_depth is not None:
+                        gt_depth = torch.tensor(gt_depth)
+                        rdepth = torch.tensor(rdepth)
+                        depth_l1_render = torch.abs(
+                            gt_depth[gt_depth > 0] -
+                            rdepth[gt_depth > 0]).mean().item() * 100
+                    else:
+                        depth_l1_render = 0.0
                     text = (f'PSNR[dB]^: {psnr.item():.2f}, SSIM^: {ssim:.2f},'
                             f'LPIPS: {lpips:.2f}, Depth_L1[cm]:'
                             f'{depth_l1_render:.2f}')

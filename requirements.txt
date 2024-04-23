@@ -18,6 +18,7 @@ scikit-image
 scikit-learn
 scipy
 seaborn
+torch_scatter
 torchmetrics
 tqdm
 trimesh==3.21.5

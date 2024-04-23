@@ -61,7 +61,7 @@ def associate(first_list, second_list, offset=0.0, max_difference=0.02):
     return matches
 
 
-def align(model, data):
+def align(model, data, correct_scale=False):
     """Align two trajectories using the method of Horn (closed-form).
 
     Input:
@@ -74,6 +74,8 @@ def align(model, data):
     trans_error -- translational error per point (1xn)
     """
     numpy.set_printoptions(precision=3, suppress=True)
+
+    # Compute rotation matrix
     model_zerocentered = model - model.mean(1)
     data_zerocentered = data - data.mean(1)
 
@@ -81,20 +83,38 @@ def align(model, data):
     for column in range(model.shape[1]):
         W += numpy.outer(model_zerocentered[:, column],
                          data_zerocentered[:, column])
-    U, d, Vh = numpy.linalg.linalg.svd(W.transpose())
+    U, d, Vh = numpy.linalg.svd(W.transpose())
     S = numpy.matrix(numpy.identity(3))
-    if (numpy.linalg.det(U) * numpy.linalg.det(Vh) < 0):
+    if numpy.linalg.det(U) * numpy.linalg.det(Vh) < 0:
         S[2, 2] = -1
     rot = U * S * Vh
-    trans = data.mean(1) - rot * model.mean(1)
 
-    model_aligned = rot * model + trans
+    if correct_scale:
+        # calculate scale
+        rotmodel = rot * model_zerocentered
+        dots = 0.0
+        norms = 0.0
+        for column in range(data_zerocentered.shape[1]):
+            dots += numpy.dot(data_zerocentered[:, column].transpose(),
+                              rotmodel[:, column])
+            norms_i = numpy.linalg.norm(model_zerocentered[:, column])
+            norms += norms_i * norms_i
+        scale = float(dots / norms)
+    else:
+        scale = 1.0
+
+    # Compute translation vector
+    trans = data.mean(1) - scale * rot * model.mean(1)
+
+    # Align model with data
+    model_aligned = scale * rot * model + trans
     alignment_error = model_aligned - data
 
+    # Compute translational error
     trans_error = numpy.sqrt(
         numpy.sum(numpy.multiply(alignment_error, alignment_error), 0)).A[0]
 
-    return rot, trans, trans_error
+    return rot, trans, trans_error, scale
 
 
 def plot_traj(ax, stamps, traj, style, color, label):
@@ -127,7 +147,11 @@ def plot_traj(ax, stamps, traj, style, color, label):
         ax.plot(x, y, style, color=color, label=label)
 
 
-def evaluate_ate(first_list, second_list, plot='', _args=''):
+def evaluate_ate(first_list,
+                 second_list,
+                 plot='',
+                 correct_scale=False,
+                 _args=''):
     # parse command line
     parser = argparse.ArgumentParser(
         description='This script computes the absolute trajectory error \
@@ -184,9 +208,11 @@ def evaluate_ate(first_list, second_list, plot='', _args=''):
         [[float(value) * float(args.scale) for value in second_list[b][0:3]]
          for a, b in matches]).transpose()
 
-    rot, trans, trans_error = align(second_xyz, first_xyz)
+    rot, trans, trans_error, scale = align(second_xyz,
+                                           first_xyz,
+                                           correct_scale=correct_scale)
 
-    second_xyz_aligned = rot * second_xyz + trans
+    second_xyz_aligned = rot * second_xyz * scale + trans
 
     first_stamps = list(first_list.keys())
     first_stamps.sort()
@@ -199,7 +225,7 @@ def evaluate_ate(first_list, second_list, plot='', _args=''):
     second_xyz_full = numpy.matrix(
         [[float(value) * float(args.scale) for value in second_list[b][0:3]]
          for b in second_stamps]).transpose()
-    second_xyz_full_aligned = rot * second_xyz_full + trans
+    second_xyz_full_aligned = rot * second_xyz_full * scale + trans
 
     if args.verbose:
         print('compared_pose_pairs %d pairs' % (len(trans_error)))
@@ -274,10 +300,12 @@ def evaluate_ate(first_list, second_list, plot='', _args=''):
         rot,
         'trans':
         trans,
+        'scale':
+        scale,
     }
 
 
-def evaluate(poses_gt, poses_est, plot):
+def evaluate(poses_gt, poses_est, plot, correct_scale=False):
 
     poses_gt = poses_gt.cpu().numpy()
     poses_est = poses_est.cpu().numpy()
@@ -286,7 +314,7 @@ def evaluate(poses_gt, poses_est, plot):
     poses_gt = dict([(i, poses_gt[i]) for i in range(N)])
     poses_est = dict([(i, poses_est[i]) for i in range(N)])
 
-    results = evaluate_ate(poses_gt, poses_est, plot)
+    results = evaluate_ate(poses_gt, poses_est, plot, correct_scale)
     return results
 
 

@@ -8,6 +8,7 @@ from typing import Dict
 import tyro
 
 from slam.algorithms.coslam import CoSLAMConfig
+from slam.algorithms.dpvo import DPVOConfig
 from slam.algorithms.nice_slam import NiceSLAMConfig
 from slam.algorithms.point_slam import PointSLAMConfig
 from slam.algorithms.splatam import SplaTAMConfig
@@ -22,6 +23,7 @@ from slam.models.conv_onet_pointslam import ConvOnet2Config
 from slam.models.gaussian_splatting import GaussianSplattingConfig
 from slam.models.joint_encoding import JointEncodingConfig
 from slam.models.sparse_voxel import SparseVoxelConfig
+from slam.models.vo_net_model import VONetModelConfig
 from slam.pipeline.mapper import MapperConfig
 from slam.pipeline.tracker import TrackerConfig
 from slam.pipeline.visualizer import VisualizerConfig
@@ -35,6 +37,7 @@ descriptions = {
     'co-slam': 'Implementation of co-slam.',
     'point-slam': 'Implementation of point-slam.',
     'splaTAM': 'Implementation of splaTAM.',
+    'dpvo': 'Implementation of DPVO.',
 }
 
 algorithm_configs['nice-slam'] = XRDSLAMerConfig(
@@ -425,6 +428,27 @@ algorithm_configs['splaTAM'] = XRDSLAMerConfig(
         enable_vis=False,
         device='cuda:0')  # TODO: only support cuda:0 now
 )
+
+algorithm_configs['dpvo'] = XRDSLAMerConfig(
+    algorithm_name='dpvo',
+    xrdslam=XRDSLAMConfig(
+        tracker=TrackerConfig(map_every=-1,
+                              render_freq=50,
+                              save_debug_result=False),
+        algorithm=DPVOConfig(
+            mapping_window_size=32,
+            patch_lifetime=13,
+            patch_per_frame=96,
+            init_frame_num=8,
+            optimization_window=10,
+            buffer_size=2048,
+            mem=32,
+            model=VONetModelConfig(
+                pretrained_path=Path('pretrained/dpvo/dpvo.pth')),
+        ),
+        visualizer=VisualizerConfig(),
+        enable_vis=False,
+        device='cuda:0'))
 
 AnnotatedBaseConfigUnion = tyro.conf.SuppressFixed[
     # Don't show unparsable (fixed) arguments in helptext.

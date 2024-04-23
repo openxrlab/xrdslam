@@ -18,7 +18,10 @@ class Frame(nn.Module):
                  rot_rep='axis_angle') -> None:
         super().__init__()
         self.fid = fid
-        self.h, self.w = depth.shape
+        if depth is not None:
+            self.h, self.w = depth.shape
+        else:
+            self.h, self.w = rgb.shape[0], rgb.shape[1]
         self.rgb = rgb
         self.depth = depth
         self.gt_pose = gt_pose

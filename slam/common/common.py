@@ -428,82 +428,118 @@ def keyframe_selection_overlap(camera,
 
 def save_render_imgs(idx, gt_color_np, gt_depth_np, color_np, depth_np,
                      img_save_dir):
-    depth_residual = np.abs(gt_depth_np - depth_np)
-    depth_residual[gt_depth_np == 0.0] = 0.0
-    max_depth = np.max(gt_depth_np)
-    gt_color_np = np.clip(gt_color_np, 0, 1)
-    color_np = np.clip(color_np, 0, 1)
-    color_residual = np.abs(gt_color_np - color_np)
-    color_residual[gt_depth_np == 0.0] = 0.0
-    color_residual = np.clip(color_residual, 0, 1)
-    # 2d metrics
-    # rgb
-    depth_mask = (torch.from_numpy(gt_depth_np > 0).unsqueeze(-1)).float()
-    gt_color = torch.tensor(gt_color_np) * depth_mask
-    rcolor = torch.tensor(color_np) * depth_mask
-    mse_loss = torch.nn.functional.mse_loss(gt_color, rcolor)
-    psnr = -10. * torch.log10(mse_loss)
-    ssim = ms_ssim(gt_color.transpose(0, 2).unsqueeze(0).float(),
-                   rcolor.transpose(0, 2).unsqueeze(0).float(),
-                   data_range=1.0,
-                   size_average=True)
-    cal_lpips = LearnedPerceptualImagePatchSimilarity(net_type='alex',
-                                                      normalize=True)
-    lpips = cal_lpips((gt_color).unsqueeze(0).permute(0, 3, 1, 2).float(),
-                      (rcolor).unsqueeze(0).permute(0, 3, 1,
-                                                    2).float()).item()
-    # depth
-    gt_depth = torch.tensor(gt_depth_np)
-    rdepth = torch.tensor(depth_np)
-    depth_l1_render = torch.abs(gt_depth[gt_depth_np > 0] -
-                                rdepth[gt_depth_np > 0]).mean().item() * 100
-    text = (f'PSNR[dB]^: {psnr.item():.2f}, '
-            f'SSIM^: {ssim:.2f}, '
-            f'LPIPS: {lpips:.2f}, '
-            f'Depth_L1[cm]: {depth_l1_render:.2f}')
+    result_2d = None
 
-    fig, axs = plt.subplots(2, 3)
-    fig.tight_layout()
-    axs[0, 0].imshow(gt_depth_np, cmap='plasma', vmin=0, vmax=max_depth)
-    axs[0, 0].set_title('Input Depth')
-    axs[0, 0].set_xticks([])
-    axs[0, 0].set_yticks([])
-    axs[0, 1].imshow(depth_np, cmap='plasma', vmin=0, vmax=max_depth)
-    axs[0, 1].set_title('Generated Depth')
-    axs[0, 1].set_xticks([])
-    axs[0, 1].set_yticks([])
-    axs[0, 2].imshow(depth_residual, cmap='plasma', vmin=0, vmax=max_depth)
-    axs[0, 2].set_title('Depth Residual')
-    axs[0, 2].set_xticks([])
-    axs[0, 2].set_yticks([])
-    axs[1, 0].imshow(gt_color_np, cmap='plasma')
-    axs[1, 0].set_title('Input RGB')
-    axs[1, 0].set_xticks([])
-    axs[1, 0].set_yticks([])
-    axs[1, 1].imshow(color_np, cmap='plasma')
-    axs[1, 1].set_title('Generated RGB')
-    axs[1, 1].set_xticks([])
-    axs[1, 1].set_yticks([])
-    axs[1, 2].imshow(color_residual, cmap='plasma')
-    axs[1, 2].set_title('RGB Residual')
-    axs[1, 2].set_xticks([])
-    axs[1, 2].set_yticks([])
-    fig.text(0.02,
-             0.02,
-             text,
-             ha='left',
-             va='bottom',
-             fontsize=12,
-             color='red')
+    gt_color_np = np.clip(gt_color_np, 0, 1)
+    if color_np is not None:
+        color_np = np.clip(color_np, 0, 1)
+        color_residual = np.abs(gt_color_np - color_np)
+        color_residual[gt_depth_np == 0.0] = 0.0
+        color_residual = np.clip(color_residual, 0, 1)
+
+    if depth_np is not None:
+        depth_residual = np.abs(gt_depth_np - depth_np)
+        depth_residual[gt_depth_np == 0.0] = 0.0
+        max_depth = np.max(gt_depth_np)
+
+        gt_color = torch.tensor(gt_color_np)
+        rcolor = torch.tensor(color_np)
+    elif color_np is not None:
+        depth_mask = (torch.from_numpy(gt_depth_np > 0).unsqueeze(-1)).float()
+        gt_color = torch.tensor(gt_color_np) * depth_mask
+        rcolor = torch.tensor(color_np) * depth_mask
+
+    # 2d metrics
+    # depth
+    if depth_np is not None:
+        gt_depth = torch.tensor(gt_depth_np)
+        rdepth = torch.tensor(depth_np)
+        depth_l1_render = torch.abs(gt_depth[gt_depth_np > 0] - rdepth[
+            gt_depth_np > 0]).mean().item() * 100
+    else:
+        depth_l1_render = 0.0
+    # rgb
+    if color_np is not None:
+        mse_loss = torch.nn.functional.mse_loss(gt_color, rcolor)
+        psnr = -10. * torch.log10(mse_loss)
+        ssim = ms_ssim(gt_color.transpose(0, 2).unsqueeze(0).float(),
+                       rcolor.transpose(0, 2).unsqueeze(0).float(),
+                       data_range=1.0,
+                       size_average=True)
+        cal_lpips = LearnedPerceptualImagePatchSimilarity(net_type='alex',
+                                                          normalize=True)
+        lpips = cal_lpips((gt_color).unsqueeze(0).permute(0, 3, 1, 2).float(),
+                          (rcolor).unsqueeze(0).permute(0, 3, 1,
+                                                        2).float()).item()
+        text = (f'PSNR[dB]^: {psnr.item():.2f}, '
+                f'SSIM^: {ssim:.2f}, '
+                f'LPIPS: {lpips:.2f}, '
+                f'Depth_L1[cm]: {depth_l1_render:.2f}')
+
+        result_2d = psnr, ssim, lpips, depth_l1_render
+
+    if depth_np is not None:
+        fig, axs = plt.subplots(2, 3)
+        fig.tight_layout()
+        axs[0, 0].imshow(gt_depth_np, cmap='plasma', vmin=0, vmax=max_depth)
+        axs[0, 0].set_title('Input Depth')
+        axs[0, 0].set_xticks([])
+        axs[0, 0].set_yticks([])
+        axs[0, 1].imshow(depth_np, cmap='plasma', vmin=0, vmax=max_depth)
+        axs[0, 1].set_title('Generated Depth')
+        axs[0, 1].set_xticks([])
+        axs[0, 1].set_yticks([])
+        axs[0, 2].imshow(depth_residual, cmap='plasma', vmin=0, vmax=max_depth)
+        axs[0, 2].set_title('Depth Residual')
+        axs[0, 2].set_xticks([])
+        axs[0, 2].set_yticks([])
+        axs[1, 0].imshow(gt_color_np, cmap='plasma')
+        axs[1, 0].set_title('Input RGB')
+        axs[1, 0].set_xticks([])
+        axs[1, 0].set_yticks([])
+        axs[1, 1].imshow(color_np, cmap='plasma')
+        axs[1, 1].set_title('Generated RGB')
+        axs[1, 1].set_xticks([])
+        axs[1, 1].set_yticks([])
+        axs[1, 2].imshow(color_residual, cmap='plasma')
+        axs[1, 2].set_title('RGB Residual')
+        axs[1, 2].set_xticks([])
+        axs[1, 2].set_yticks([])
+        fig.text(0.02,
+                 0.02,
+                 text,
+                 ha='left',
+                 va='bottom',
+                 fontsize=12,
+                 color='red')
+    else:
+        if gt_depth_np is None:
+            fig, axs = plt.subplots(1, 1)
+            axs.imshow(gt_color_np, cmap='plasma')
+            axs.set_title('Input RGB')
+            axs.set_xticks([])
+            axs.set_yticks([])
+        else:
+            fig, axs = plt.subplots(1, 2)
+            axs[0].imshow(gt_color_np, cmap='plasma')
+            axs[0].set_title('Input RGB')
+            axs[0].set_xticks([])
+            axs[0].set_yticks([])
+            max_depth = np.max(gt_depth_np)
+            axs[1].imshow(gt_depth_np, cmap='plasma', vmin=0, vmax=max_depth)
+            axs[1].set_title('Input Depth')
+            axs[1].set_xticks([])
+            axs[1].set_yticks([])
 
     plt.subplots_adjust(wspace=0, hspace=0)
-    plt.savefig(f'{img_save_dir}/{idx:05d}.jpg',
-                bbox_inches='tight',
-                pad_inches=0.2)
+    if color_np is not None:
+        plt.savefig(f'{img_save_dir}/{idx:05d}.jpg',
+                    bbox_inches='tight',
+                    pad_inches=0.2)
     plt.clf()
     plt.close()
 
-    return psnr, ssim, lpips, depth_l1_render
+    return result_2d
 
 
 def rgbd2pcd(color_np, depth_np, c2w_np, camera, render_mode, device):

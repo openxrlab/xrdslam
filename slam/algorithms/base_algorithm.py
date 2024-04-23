@@ -209,10 +209,11 @@ class Algorithm():
                 })
 
     def do_tracking(self, cur_frame):
-        optimize_frames = [cur_frame]
-        return self.optimize_update(self.config.tracking_n_iters,
-                                    optimize_frames,
-                                    is_mapping=False)
+        if self.is_initialized():
+            optimize_frames = [cur_frame]
+            return self.optimize_update(self.config.tracking_n_iters,
+                                        optimize_frames,
+                                        is_mapping=False)
 
     def do_mapping(self, cur_frame):
         if not self.is_initialized():

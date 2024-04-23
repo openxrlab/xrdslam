@@ -19,10 +19,10 @@ OpenXRLab Deep-learning based SLAM Toolbox and Benchmark. It is a part of the Op
 
 We provide a set of pre-implemented deep-learning based SLAM algorithms.
 
-| Replica/office0                                              |                                                              |                                                              |                                                              |                                                              |
-| :----------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [nice-slam](https://github.com/cvg/nice-slam)                | [co-slam](https://github.com/HengyiWang/Co-SLAM)             | [Vox-Fusion](https://github.com/zju3dv/Vox-Fusion)           | [Point_SLAM](https://github.com/eriksandstroem/Point-SLAM)   | [splaTAM](https://github.com/spla-tam/SplaTAM)               |
-| <img src="./docs/imgs/nice_slam.gif" alt="nice-slam" style="zoom: 50%;" /> | <img src="./docs/imgs/co_slam.gif" alt="nice-slam" style="zoom: 50%;" /> | <img src="./docs/imgs/vox_fusion.gif" alt="nice-slam" style="zoom: 50%;" /> | <img src="./docs/imgs/point_slam.gif" alt="nice-slam" style="zoom: 50%;" /> | <img src="./docs/imgs/splatam.gif" alt="nice-slam" style="zoom: 50%;" /> |
+| Replica/office0                                              |                                                              |                                                              |                                                              |                                                              |                                                              |
+| :----------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [nice-slam](https://github.com/cvg/nice-slam)                | [co-slam](https://github.com/HengyiWang/Co-SLAM)             | [Vox-Fusion](https://github.com/zju3dv/Vox-Fusion)           | [Point_SLAM](https://github.com/eriksandstroem/Point-SLAM)   | [splaTAM](https://github.com/spla-tam/SplaTAM)               | [DPVO](https://github.com/princeton-vl/DPVO)                 |
+| <img src="./docs/imgs/nice_slam.gif" alt="nice-slam" style="zoom: 50%;" /> | <img src="./docs/imgs/co_slam.gif" alt="nice-slam" style="zoom: 50%;" /> | <img src="./docs/imgs/vox_fusion.gif" alt="nice-slam" style="zoom: 50%;" /> | <img src="./docs/imgs/point_slam.gif" alt="nice-slam" style="zoom: 50%;" /> | <img src="./docs/imgs/splatam.gif" alt="nice-slam" style="zoom: 50%;" /> | <img src="./docs/imgs/dpvo.gif" alt="dpvo" style="zoom: 50%;" /> |
 
 ## Quickstart
 
@@ -49,7 +49,6 @@ conda activate xrdslam
 **Build extension**
 
 ```
-# for vox-fusion 3rd-party
 cd third_party
 bash install.sh
 ```
@@ -188,6 +187,7 @@ Note: The default configuration in the algorithm is suitable for Replica. If you
 | Point-SLAM_X | 0.47                | 34.10 | 0.97  | 0.10   | 99.30           | 83.78        | 90.86   | 0.38           | 1.25           | 3.12           | 88.15                  |
 | SplaTAM      | 0.36                | 34.11 | 0.97  | 0.10   | -               | -            | -       | -              | -              | -              | -                      |
 | SplaTAM_X    | 0.40                | 34.44 | 0.96  | 0.09   | -               | -            | -       | -              | -              | -              | -                      |
+| DPVO_X | 0.36 | - | - | - | - | - | - | - | - | - | - |
 
 ## License
 
@@ -196,7 +196,7 @@ Please note that this license only applies to the code in our library, the depen
 
 ## Acknowledgement
 
-In addition to the implemented algorithm ([nice-slam](https://github.com/cvg/nice-slam),[co-slam](https://github.com/HengyiWang/Co-SLAM),[Vox-Fusion](https://github.com/zju3dv/Vox-Fusion),[Point_SLAM](https://github.com/eriksandstroem/Point-SLAM),[splaTAM](https://github.com/spla-tam/SplaTAM)), our code also adapt some codes from [nerfStudio](https://github.com/nerfstudio-project/nerfstudio/), [sdfstudio](https://autonomousvision.github.io/sdfstudio/). Thanks for making the code available.
+In addition to the implemented algorithm ([nice-slam](https://github.com/cvg/nice-slam),[co-slam](https://github.com/HengyiWang/Co-SLAM),[Vox-Fusion](https://github.com/zju3dv/Vox-Fusion),[Point_SLAM](https://github.com/eriksandstroem/Point-SLAM),[splaTAM](https://github.com/spla-tam/SplaTAM), [DPVO](https://github.com/princeton-vl/DPVO)), our code also adapt some codes from [nerfStudio](https://github.com/nerfstudio-project/nerfstudio/), [sdfstudio](https://autonomousvision.github.io/sdfstudio/). Thanks for making the code available.
 
 ## Built On
 

@@ -164,7 +164,7 @@ def draw_trajectory(queue, output, init_pose, cam_scale, save_rendering, near,
 
     # set the viewer's pose in the back of the first frame's pose
     param = ctr.convert_to_pinhole_camera_parameters()
-    if algorithm_name != 'splaTAM':
+    if algorithm_name != 'splaTAM' and algorithm_name != 'dpvo':
         init_pose[:3, 3] += 6 * normalize(init_pose[:3, 2])
         init_pose[:3, 2] *= -1
         init_pose[:3, 1] *= -1
@@ -202,7 +202,7 @@ class SLAMFrontend:
             pose = pose.cpu().numpy()
 
         # Note: splaTAM should not use pose[:3, 2] *= -1
-        if self.algorithm_name != 'splaTAM':
+        if self.algorithm_name != 'splaTAM' and self.algorithm_name != 'dpvo':
             pose[:3, 2] *= -1
         self.queue.put_nowait(('pose', index, pose, gt))
 

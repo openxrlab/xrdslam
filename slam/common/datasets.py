@@ -2,12 +2,15 @@
 # (https://github.com/cvg/nice-slam/blob/master/src/utils/datasets.py)
 # licensed under the Apache License, Version 2.0.
 
+import csv
 import glob
 import os
 
 import cv2
 import numpy as np
 import torch
+import yaml
+from scipy.spatial.transform import Rotation
 from torch.utils.data import Dataset
 
 from slam.common.camera import Camera
@@ -53,9 +56,11 @@ def get_dataset(data_path, data_type, device='cuda:0'):
     return dataset_dict[data_type](data_path, device=device)
 
 
+# RGBD dataset
 class BaseDataset(Dataset):
     def __init__(self, data_path, device='cuda:0'):
         super(BaseDataset, self).__init__()
+        self.data_format = 'RGBD'
 
         self.input_folder = data_path
         self.device_yml = os.path.join(data_path, 'devices.yaml')
@@ -124,8 +129,9 @@ class BaseDataset(Dataset):
         color_data = torch.from_numpy(color_data)
         depth_data = torch.from_numpy(depth_data)
         pose = self.poses[index]
-        return index, color_data.to(self.device), depth_data.to(
-            self.device), pose.to(self.device)
+        return index, color_data.to(self.device).to(
+            torch.float), depth_data.to(self.device).to(torch.float), pose.to(
+                self.device).to(torch.float)
 
     def get_camera(self):
         return self.camera
@@ -158,6 +164,160 @@ class Replica(BaseDataset):
             c2w[:3, 2] *= -1
             c2w = torch.from_numpy(c2w).float()
             self.poses.append(c2w)
+
+
+# mono_imu dataset
+class Euroc(Dataset):
+    def __init__(self, data_path, device='cuda:0'):
+
+        self.data_format = 'MonoImu'
+
+        self.input_folder = data_path
+        self.device = device
+        self.last_img_timestamp = -1
+
+        self.cam0_yml = os.path.join(data_path, 'mav0/cam0/sensor.yaml')
+        cam0_cfg = self.read_yaml(self.cam0_yml)
+        self.imu0_yml = os.path.join(data_path, 'mav0/imu0/sensor.yaml')
+        imu0_cfg = self.read_yaml(self.imu0_yml)
+
+        # cam0 intrinsics
+        self.H, self.W = cam0_cfg['resolution'][1], cam0_cfg['resolution'][0]
+        self.fx, self.fy, self.cx, self.cy = cam0_cfg['intrinsics'][
+            0], cam0_cfg['intrinsics'][1], cam0_cfg['intrinsics'][2], cam0_cfg[
+                'intrinsics'][3]
+        self.cam0_distortion = np.array(
+            cam0_cfg['distortion_coefficients']
+        ) if 'distortion_coefficients' in cam0_cfg else None
+
+        # imu0
+        self.gyro_n = imu0_cfg['gyroscope_noise_density']
+        self.gyro_rw = imu0_cfg['gyroscope_random_walk']
+        self.acc_n = imu0_cfg['accelerometer_noise_density']
+        self.acc_rw = imu0_cfg['accelerometer_random_walk']
+        self.imu_hz = imu0_cfg['rate_hz']
+
+        self.crop_edge = 0
+        self.downsample_factor = 1
+
+        self.camera = Camera(
+            fx=self.fx,
+            fy=self.fy,
+            cx=self.cx,
+            cy=self.cy,
+            height=self.H,
+            width=self.W,
+        )
+
+        self.img_timestamps, self.color_paths = self.get_imgs_path(
+            f'{self.input_folder}/mav0/cam0/data.csv')
+        self.n_img = len(self.color_paths)
+        self.load_poses(
+            f'{self.input_folder}/mav0/state_groundtruth_estimate0/data.csv')
+        self.load_imu(f'{self.input_folder}/mav0/imu0/data.csv')
+
+    def __len__(self):
+        return self.n_img
+
+    def __getitem__(self, index):
+        color_path = self.color_paths[index]
+        color_data = cv2.imread(color_path)
+
+        if self.cam0_distortion is not None:
+            K = as_intrinsics_matrix([self.fx, self.fy, self.cx, self.cy])
+            color_data_ud = color_data.copy()
+            color_data = cv2.undistort(color_data_ud, K, self.cam0_distortion)
+
+        color_data = cv2.cvtColor(color_data, cv2.COLOR_BGR2RGB)
+        color_data = color_data / 255.
+        color_data = torch.from_numpy(color_data)  # [H,W,C]
+
+        # pose = self.poses[index]
+        pose = self.get_img_pose(self.img_timestamps[index])
+        imu_datas = torch.empty((0, ))
+        if self.last_img_timestamp > 0:
+            imu_datas = self.get_imu_data(self.last_img_timestamp,
+                                          self.img_timestamps[index])
+            imu_datas = torch.from_numpy(imu_datas)
+            self.last_img_timestamp = self.img_timestamps[index]
+
+        return index, color_data.to(self.device).to(torch.float), imu_datas.to(
+            self.device), pose.to(self.device).to(torch.float)
+
+    def get_img_pose(self, t0):
+        nearest_index = np.argmin(np.abs(np.array(self.gt_timestamps) - t0))
+        return self.poses[nearest_index]
+
+    def get_imu_data(self, t0, t1):
+        out_imus = []
+        for i, timestamp in enumerate(self.imu_timestamps):
+            if t0 <= timestamp <= t1:
+                out_imus.append((timestamp, self.imu_datas[i]))
+        return out_imus
+
+    def get_camera(self):
+        return self.camera
+
+    def read_yaml(self, path):
+        with open(path, 'r') as f:
+            first_line = f.readline()
+            if first_line.startswith('%'):
+                yaml_content = f.read()
+            else:
+                yaml_content = first_line + f.read()
+        yaml_cfg = yaml.safe_load(yaml_content)
+        return yaml_cfg
+
+    def get_imgs_path(self, data_csv):
+        img_timestamps = []
+        color_paths = []
+        with open(data_csv, 'r') as file:
+            next(file)
+            for line in file:
+                parts = line.strip().split(',')
+                timestamp = int(parts[0])
+                filename = parts[1]
+                img_timestamps.append(timestamp)
+                color_paths.append(
+                    os.path.join(os.path.dirname(data_csv), 'data', filename))
+        return img_timestamps, color_paths
+
+    def load_imu(self, path):
+        self.imu_timestamps = []
+        self.imu_datas = []  # t, gyro, acc
+        with open(path, 'r') as file:
+            reader = csv.reader(file, delimiter=',')
+            next(reader)
+            for row in reader:
+                timestamp = int(row[0])
+                self.imu_timestamps.append(timestamp)
+                imu_data = [float(row[i]) for i in range(1, 7)]
+                self.imu_datas.append(imu_data)
+
+    def load_poses(self, path):
+        self.gt_timestamps = []
+        self.poses = []
+
+        with open(path, newline='') as csvfile:
+            reader = csv.reader(csvfile)
+            next(reader)
+            for row in reader:
+                self.gt_timestamps.append(int(row[0]))
+                line_data = {
+                    'position': [float(row[i]) for i in range(1, 4)],
+                    'orientation': [float(row[i]) for i in range(4, 8)],
+                    'velocity': [float(row[i]) for i in range(8, 11)],
+                    'bias_w': [float(row[i]) for i in range(11, 14)],
+                    'bias_a': [float(row[i]) for i in range(14, 17)]
+                }
+                position = np.array(line_data['position'])
+                orientation = np.array(line_data['orientation'])
+                R = Rotation.from_quat(orientation).as_matrix()
+                c2w = np.eye(4)
+                c2w[:3, :3] = R
+                c2w[:3, 3] = position
+                c2w = torch.from_numpy(c2w).float()
+                self.poses.append(c2w)
 
 
 class Azure(BaseDataset):
@@ -351,5 +511,6 @@ dataset_dict = {
     'scannet': ScanNet,
     'cofusion': CoFusion,
     'azure': Azure,
-    'tumrgbd': TUM_RGBD
+    'tumrgbd': TUM_RGBD,
+    'euroc': Euroc,
 }

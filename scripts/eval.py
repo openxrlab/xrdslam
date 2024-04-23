@@ -25,6 +25,7 @@ class EvalMatrics:
 
     eval_traj: bool = True
     eval_recon: bool = True
+    correct_scale: bool = False
 
     def main(self) -> None:
         """Main function."""
@@ -45,7 +46,8 @@ class EvalMatrics:
             poses_est = poses_est[mask]
             traj_result = evaluate(poses_gt,
                                    poses_est,
-                                   plot=f'{output}/eval_ate_plot.png')
+                                   plot=f'{output}/eval_ate_plot.png',
+                                   correct_scale=self.correct_scale)
             print(traj_result)
         if self.eval_recon:
             if self.gt_mesh is None or not os.path.exists(self.gt_mesh):
