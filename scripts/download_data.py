@@ -102,14 +102,12 @@ class SLAMDatasetDownload(DatasetDownload):
                 tar_ref.extractall(str(tmp_path))
         else:
             raise NotImplementedError
-
-        inner_folders = os.listdir(tmp_path)
-        assert len(
-            inner_folders
-        ) == 1, 'There is more than one folder inside this zip file.'
-        folder = os.path.join(tmp_path, inner_folders[0])
+        
         shutil.rmtree(target_path)
-        shutil.move(folder, target_path)
+        for in_folder in os.listdir(tmp_path):
+            folder = os.path.join(tmp_path, in_folder)
+            target_folder = os.path.join(target_path, in_folder)
+            shutil.move(folder, target_folder)
         shutil.rmtree(tmp_path)
         os.remove(download_path)
 
