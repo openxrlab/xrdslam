@@ -61,6 +61,8 @@ A single Replica dataset has a total of 2000 frames, rendering is performed ever
 
 ## 3D metrics
 
+Note:  When evaluating 3D metrics, the default value of distance_thresh is 0.01. However, for NeuralRecon, the default value of distance_thresh is 0.05. Therefore, 3D metrics are provided under these two threshold values respectively.
+
 | Algorithm       | Metric                | Room0 | Room1 | Room2 | Office0 | Office1 | Office2 | Office3 | Office4 | Average |
 | ------------ | --------------------- | ----- | ----- | ----- | ------- | ------- | ------- | ------- | ------- | ------- |
 | NICE-SLAM    | Depth L1[cm] -        | 1.81  | 1.44  | 2.04  | 1.39    | 1.76    | 8.33    | 4.99    | 2.01    | 2.97    |
@@ -114,6 +116,18 @@ A single Replica dataset has a total of 2000 frames, rendering is performed ever
 |              | Acc. [cm]-            | 1.45  | 1.14  | 1.20  | 1.04    | 0.85    | 1.32    | 1.56    | 1.48    | 1.25    |
 |              | Comp. [cm]-           | 3.62  | 3.07  | 3.01  | 1.69    | 2.37    | 3.66    | 3.53    | 4.02    | 3.12    |
 |              | Comp. Ratio[<5cm %] + | 87.60 | 89.13 | 89.43 | 93.00   | 89.42   | 85.85   | 85.56   | 85.23   | 88.15   |
+| NeuralRecon_X | Precision [%] + | 13.06 | 10.91 | 13.53 | 13.64 | 16.73 | 17.85 | 10.98 | 9.67 | 13.29 |
+|  | Recall [%] + | 6.48 | 6.63 | 8.44 | 8.86 | 9.09 | 9.71 | 5.29 | 5.01 | 7.43 |
+| | F1[%] + | 8.66 | 8.25 | 10.40 | 10.74 | 11.78 | 12.57 | 7.13 | 6.60 | 9.51 |
+| | Acc. [cm]- | 5.47 | 6.24 | 6.31 | 5.25 | 3.60 | 6.06 | 7.05 | 7.00 | 5.87 |
+| | Comp. [cm]- | 24.02 | 13.70 | 20.03 | 10.69 | 11.48 | 25.13 | 28.52 | 21.38 | 19.36 |
+| | Comp. Ratio[<5cm %] + | 34.26 | 39.52 | 40.36 | 51.55 | 45.00 | 35.44 | 30.63 | 28.29 | 38.13 |
+| NeuralRecon_X | Precision [%] + | 66.12 | 57.03 | 59.09 | 69.01 | 73.34 | 63.89 | 60.87 | 50.10 | 62.43 |
+| distance_thresh=0.05 | Recall [%] + | 35.06 | 40.10 | 40.98 | 51.96 | 45.14 | 35.88 | 31.72 | 29.15 | 38.74 |
+| | F1[%] + | 45.82 | 47.09 | 48.40 | 59.29 | 55.88 | 45.95 | 41.71 | 36.86 | 47.62 |
+| | Acc. [cm]- | 5.47 | 6.23 | 6.30 | 5.19 | 3.60 | 6.07 | 7.08 | 7.03 | 5.87 |
+| | Comp. [cm]- | 24.11 | 13.76 | 19.88 | 10.71 | 11.56 | 25.21 | 28.43 | 21.45 | 19.38 |
+| | Comp. Ratio[<5cm %] + | 34.28 | 39.42 | 40.52 | 51.48 | 44.86 | 35.39 | 30.76 | 28.29 | 38.12 |
 
 # Euroc
 
@@ -125,3 +139,23 @@ Note: DPVO run with monocular data and requires scale correction during trajecto
 | ----------------------- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ------- |
 | DPVO                    | 8.7  | 5.5  | 15.8 | 13.7 | 11.4 | 5.0  | 14.0 | 8.6  | 5.7  | 4.9  | 21.1 | 10.5    |
 | DPVO_X                  | 10.0 | 7.4  | 11.8 | 15.2 | 8.7  | 9.4  | 15.9 | 10.2 | 6.6  | 6.4  | 12.3 | 10.4    |
+
+# 7-Scenes
+
+## 3D metrics
+
+Note:  The distance_thresh is 0.05 for both NeuralRecon_X and NeuralRecon.
+
+The original paper didn't offer individual dataset results. Hence, only XRDSLAM results per dataset are provided here. Also, due to the absence of default parameters for 7-Scenes in the original code, there are minor discrepancies between the results of NeuralRecon_X and the original NeuralRecon.
+
+| Algorithm     | Precision [%] + | Recall [%] + | F1[%] + | Acc. [cm]- | Comp. [cm]- |
+| ------------- | --------------- | ------------ | ------- | ---------- | ----------- |
+| NeuralRecon   | 38.9            | 22.7         | 28.2    | 10.0       | 22.8        |
+| NeuralRecon_X | 37.51           | 21.24        | 26.55   | 14.23      | 32.21       |
+
+| Method        | Metric          | chess-seq-03 | chess-seq-05 | fire-seq-03 | fire-seq-04 | heads-seq-01 | office-seq-02 | office-seq-06 | office-seq-07 | office-seq-09 | pumpkin-seq-01 | pumpkin-seq-07 | redkitchen-seq-03 | redkitchen-seq-04 | redkitchen-seq-06 | stairs-seq-01 | stairs-seq-04 | Average |
+| ------------- | --------------- | ------------ | ------------ | ----------- | ----------- | ------------ | ------------- | ------------- | ------------- | ------------- | -------------- | -------------- | ----------------- | ----------------- | ----------------- | ------------- | ------------- | ------- |
+| NeuralRecon_X | Precision [%] + | 48.37        | 36.21        | 40.08       | 47.90       | 51.00        | 26.64         | 24.83         | 31.73         | 42.93         | 39.97          | 26.39          | 24.93             | 44.30             | 35.07             | 40.95         | 38.87         | 37.51   |
+|               | Recall [%] +    | 30.98        | 27.37        | 31.88       | 30.45       | 24.57        | 18.24         | 25.93         | 22.37         | 26.35         | 17.91          | 11.78          | 9.34              | 19.80             | 16.49             | 15.32         | 11.15         | 21.24   |
+|               | F1[%] +         | 37.77        | 31.18        | 35.51       | 37.24       | 33.16        | 21.65         | 25.37         | 26.24         | 32.66         | 24.74          | 16.29          | 13.59             | 27.37             | 22.43             | 22.30         | 17.31         | 26.55   |
+|               | Acc. [cm]-      | 7.68         | 8.97         | 8.88        | 7.56        | 9.74         | 25.26         | 23.20         | 12.90         | 8.82          | 13.71          | 26.97          | 25.95             | 11.24             | 10.97             | 16.01         | 9.96          | 14.23   |

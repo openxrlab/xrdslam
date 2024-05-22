@@ -23,9 +23,9 @@ We provide a set of pre-implemented deep-learning based SLAM algorithms.
 
 **Replica/office0**
 
-| [nice-slam](https://github.com/cvg/nice-slam)                | [co-slam](https://github.com/HengyiWang/Co-SLAM)             | [Vox-Fusion](https://github.com/zju3dv/Vox-Fusion)           | [Point_SLAM](https://github.com/eriksandstroem/Point-SLAM)   | [splaTAM](https://github.com/spla-tam/SplaTAM)               | [DPVO](https://github.com/princeton-vl/DPVO)                 |
-| :----------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| <img src="./docs/imgs/nice_slam.gif" alt="nice-slam" style="zoom: 50%;" /> | <img src="./docs/imgs/co_slam.gif" alt="nice-slam" style="zoom: 50%;" /> | <img src="./docs/imgs/vox_fusion.gif" alt="nice-slam" style="zoom: 50%;" /> | <img src="./docs/imgs/point_slam.gif" alt="nice-slam" style="zoom: 50%;" /> | <img src="./docs/imgs/splatam.gif" alt="nice-slam" style="zoom: 50%;" /> | <img src="./docs/imgs/dpvo.gif" alt="dpvo" style="zoom: 50%;" /> |
+| [nice-slam](https://github.com/cvg/nice-slam)                | [co-slam](https://github.com/HengyiWang/Co-SLAM)             | [Vox-Fusion](https://github.com/zju3dv/Vox-Fusion)           | [Point_SLAM](https://github.com/eriksandstroem/Point-SLAM)   | [splaTAM](https://github.com/spla-tam/SplaTAM)               | [DPVO](https://github.com/princeton-vl/DPVO)                 | [NeuralRecon](https://github.com/zju3dv/NeuralRecon)         |
+| :----------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| <img src="./docs/imgs/nice_slam.gif" alt="nice-slam" style="zoom: 50%;" /> | <img src="./docs/imgs/co_slam.gif" alt="nice-slam" style="zoom: 50%;" /> | <img src="./docs/imgs/vox_fusion.gif" alt="nice-slam" style="zoom: 50%;" /> | <img src="./docs/imgs/point_slam.gif" alt="nice-slam" style="zoom: 50%;" /> | <img src="./docs/imgs/splatam.gif" alt="nice-slam" style="zoom: 50%;" /> | <img src="./docs/imgs/dpvo.gif" alt="dpvo" style="zoom: 50%;" /> | <img src="./docs/imgs/neural_recon.gif" alt="neural_recon" style="zoom: 50%;" /> |
 
 ## Quickstart
 
@@ -144,7 +144,7 @@ usage: ds-viewer [-h] [--config.vis-dir PATH] [--config.save-rendering {True,Fal
 
 - --config.algorithm-name
 
-  NOTE: When use splaTAM or DPVO, algorithm name should be set. (default: None)
+  NOTE: When use splaTAM or DPVO or NeuralRecon, algorithm name should be set. (default: None)
 
 #### ds-eval
 
@@ -180,7 +180,7 @@ Here are the comparison results on **Replica** datasets. The results of the orig
 
 The algorithms with _X suffix are the corresponding algorithms in the XRDSLAM framework. For details, see [benchmark](docs/benchmark.md).
 
-(DPVO is a visual odometry (VO) algorithm that does not generate meshes, and  DPVO paper does not provide results for the Replica datasets. Therefore, here we only present the trajectory metrics from  XRDSLAM framework.  The comparison results of DPVO for the Euroc dataset can be found in the [benchmark](docs/benchmark.md).)
+(DPVO is a visual odometry (VO) algorithm that does not generate meshes, and  DPVO paper does not provide results for the Replica datasets. Therefore, here we only present the trajectory metrics from  XRDSLAM framework.  The comparison results of DPVO for the Euroc dataset can be found in the [benchmark](docs/benchmark.md). NeuralRecon is a mapping algorithm, and  NeuralRecon paper does not provide results for the Replica datasets. Therefore, here we only present the mesh metrics from  XRDSLAM framework.  The comparison results of NeuralRecon for the 7Scenes dataset can be found in the [benchmark](docs/benchmark.md).)
 
 Note: The default configuration in the algorithm is suitable for Replica. If you use other datasets, you need to modify the corresponding configuration items in slam/configs/input_config.py.
 
@@ -197,6 +197,7 @@ Note: The default configuration in the algorithm is suitable for Replica. If you
 | SplaTAM      | 0.36                | 34.11 | 0.97  | 0.10   | -               | -            | -       | -              | -              | -              | -                      |
 | SplaTAM_X    | 0.40                | 34.44 | 0.96  | 0.09   | -               | -            | -       | -              | -              | -              | -                      |
 | DPVO_X | 0.31 | - | - | - | - | - | - | - | - | - | - |
+| NeuralRecon_X | - | - | - | - | 13.29 | 7.43 | 9.51 | - | 5.87 | 19.36 | 38.13 |
 
 ## License
 
