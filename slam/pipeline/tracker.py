@@ -5,10 +5,12 @@ from typing import Type
 import numpy as np
 import open3d as o3d
 import torch
+import trimesh
+from packaging import version
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from slam.common.common import cull_mesh, save_render_imgs
+from slam.common.common import clean_mesh, cull_mesh, save_render_imgs
 from slam.common.datasets import BaseDataset
 from slam.common.frame import Frame
 from slam.configs.base_config import InstantiateConfig
@@ -23,6 +25,7 @@ class TrackerConfig(InstantiateConfig):
     lazy_start: int = -1  # if to map every frame at beginning, default not
     use_relative_pose: bool = False
     save_debug_result: bool = False
+    save_gt_mesh: bool = False
     save_re_render_result: bool = True  # for evaluation
     init_pose_offset: int = 0
 
@@ -159,6 +162,9 @@ class Tracker():
             print('Starting re-rendering frames...')
             self.save_re_render_frames(algorithm)
 
+        if self.config.save_gt_mesh:
+            self.save_gt_mesh()
+
         # set finished
         algorithm.set_finished()
 
@@ -236,10 +242,13 @@ class Tracker():
                   f'lpips: {lpips}, depth_l1_render[cm]: {depth_l1_render}')
         # save mesh
         mesh_savepath = f'{self.out_dir}/mesh/{idx_np:05d}.ply'
-        if idx_np == len(self.dataset) - 1:
-            mesh_savepath = f'{self.out_dir}/final_mesh_rec.ply'
-            mesh = algorithm.get_mesh()
-            if mesh is not None:
+        mesh = algorithm.get_mesh()
+        if mesh is not None:
+            mesh.export(mesh_savepath)
+            if idx_np == len(self.dataset) - 1:
+                mesh_savepath = f'{self.out_dir}/final_mesh.ply'
+                mesh.export(mesh_savepath)
+                mesh_savepath = f'{self.out_dir}/final_mesh_rec.ply'
                 culled_mesh = cull_mesh(
                     dataset=self.dataset,
                     mesh=mesh,
@@ -269,6 +278,67 @@ class Tracker():
             _use_new_zipfile_serialization=False)
 
         return result_2d
+
+    def save_gt_mesh(self):
+        H, W, fx, fy, cx, cy = (self.dataset.camera.height,
+                                self.dataset.camera.width,
+                                self.dataset.camera.fx, self.dataset.camera.fy,
+                                self.dataset.camera.cx, self.dataset.camera.cy)
+        voxel_size = 4
+        if version.parse(o3d.__version__) >= version.parse('0.13.0'):
+            # for new version as provided in environment.yaml
+            volume = o3d.pipelines.integration.ScalableTSDFVolume(
+                voxel_length=float(voxel_size) / 100.0,
+                sdf_trunc=3 * float(voxel_size) / 100,
+                color_type=o3d.pipelines.integration.TSDFVolumeColorType.RGB8)
+        else:
+            # for lower version
+            volume = o3d.integration.ScalableTSDFVolume(
+                voxel_length=float(voxel_size) / 100.0,
+                sdf_trunc=3 * float(voxel_size) / 100,
+                color_type=o3d.integration.TSDFVolumeColorType.RGB8)
+        for cur_data in DataLoader(self.dataset,
+                                   batch_size=1,
+                                   shuffle=False,
+                                   num_workers=1):
+            if self.dataset.data_format == 'RGBD':
+                idx, gt_color, gt_depth, gt_c2w = cur_data
+            else:
+                print(
+                    'There are no depth image, Not support generate gt mesh!')
+                return
+            gt_depth_np = gt_depth[0].cpu().numpy()
+            gt_color_np = gt_color[0].cpu().numpy()
+            gt_c2w = gt_c2w[0]
+            gt_c2w_np = gt_c2w.cpu().numpy()
+
+            c2w = gt_c2w_np
+            # convert to open3d camera pose
+            c2w[:3, 1] *= -1.0
+            c2w[:3, 2] *= -1.0
+            w2c = np.linalg.inv(c2w)
+            depth = gt_depth_np
+            color = gt_color_np
+            depth = o3d.geometry.Image(depth.astype(np.float32))
+            color = o3d.geometry.Image(np.array(
+                (color * 255).astype(np.uint8)))
+            intrinsic = o3d.camera.PinholeCameraIntrinsic(W, H, fx, fy, cx, cy)
+            rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(
+                color,
+                depth,
+                depth_scale=1,
+                depth_trunc=5.0,
+                convert_rgb_to_intensity=False)
+            volume.integrate(rgbd, intrinsic, w2c)
+        o3d_mesh = volume.extract_triangle_mesh()
+        vertices = o3d_mesh.vertices
+        faces = o3d_mesh.triangles
+        gt_mesh = trimesh.Trimesh(vertices=vertices, faces=faces)
+        mesh_savepath = f'{self.out_dir}/gt_mesh.ply'
+        gt_mesh.export(mesh_savepath)
+        gt_mesh_clean = clean_mesh(o3d_mesh)
+        mesh_savepath = f'{self.out_dir}/gt_mesh_clean.ply'
+        gt_mesh_clean.export(mesh_savepath)
 
     def save_re_render_frames(self, algorithm):
         self.frame_cnt, self.psnr_sum, self.ssim_sum, self.lpips_sum, \
@@ -320,12 +390,7 @@ class Tracker():
                 mesh = algorithm.get_mesh()
                 if mesh is not None:
                     mesh_savepath = f'{self.out_dir}/final_mesh.ply'
-                    culled_mesh = cull_mesh(
-                        dataset=self.dataset,
-                        mesh=mesh,
-                        estimate_c2w_list=algorithm.get_estimate_c2w_list(),
-                        eval_rec=False)
-                    culled_mesh.export(mesh_savepath)
+                    mesh.export(mesh_savepath)
                     mesh_savepath = f'{self.out_dir}/final_mesh_rec.ply'
                     culled_mesh = cull_mesh(
                         dataset=self.dataset,

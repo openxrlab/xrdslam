@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 import torch
 import torch.nn.functional as F
+import transforms3d
+import trimesh
+from skimage import measure
 
 
 def coordinates(voxel_dim, device: torch.device, flatten=True):
@@ -370,3 +373,128 @@ def get_mask_from_c2w(camera, bound, c2w, key, val_shape, depth_np):
     points = points[mask]
     mask = mask.reshape(val_shape[2], val_shape[1], val_shape[0])
     return mask
+
+
+def rigid_transform(xyz, transform):
+    """Code from NeuralRecon, licensed under the Apache License, Version 2.0.
+
+    Applies a rigid transform to an (N, 3) pointcloud.
+    """
+    xyz_h = torch.cat([xyz, torch.ones((len(xyz), 1))], dim=1)
+    xyz_t_h = (transform @ xyz_h.T).T
+    return xyz_t_h[:, :3]
+
+
+def rotx(t):
+    """Code from NeuralRecon, licensed under the Apache License, Version 2.0.
+
+    3D Rotation about the x-axis.
+    """
+    c = np.cos(t)
+    s = np.sin(t)
+    return np.array([[1, 0, 0], [0, c, -s], [0, s, c]])
+
+
+def get_view_frustum(max_depth, size, cam_intr, cam_pose):
+    """Code from NeuralRecon, licensed under the Apache License, Version 2.0.
+
+    Get corners of 3D camera view frustum of depth image.
+    """
+    im_h, im_w = size
+    im_h = int(im_h)
+    im_w = int(im_w)
+    view_frust_pts = torch.stack([
+        (torch.tensor([0, 0, 0, im_w, im_w]) - cam_intr[0, 2]) *
+        torch.tensor([0, max_depth, max_depth, max_depth, max_depth]) /
+        cam_intr[0, 0],
+        (torch.tensor([0, 0, im_h, 0, im_h]) - cam_intr[1, 2]) *
+        torch.tensor([0, max_depth, max_depth, max_depth, max_depth]) /
+        cam_intr[1, 1],
+        torch.tensor([0, max_depth, max_depth, max_depth, max_depth])
+    ])
+    view_frust_pts = rigid_transform(view_frust_pts.T, cam_pose).T
+    return view_frust_pts
+
+
+def apply_log_transform(tsdf):
+    sgn = torch.sign(tsdf)
+    out = torch.log(torch.abs(tsdf) + 1)
+    out = sgn * out
+    return out
+
+
+def sparse_to_dense_torch(locs, values, dim, default_val, device):
+    """Code from NeuralRecon, licensed under the Apache License, Version
+    2.0."""
+    dense = torch.full([dim[0], dim[1], dim[2]],
+                       float(default_val),
+                       device=device)
+    if locs.shape[0] > 0:
+        dense[locs[:, 0], locs[:, 1], locs[:, 2]] = values
+    return dense
+
+
+def sparse_to_dense_channel(locs, values, dim, c, default_val, device):
+    """Code from NeuralRecon, licensed under the Apache License, Version
+    2.0."""
+    dense = torch.full([dim[0], dim[1], dim[2], c],
+                       float(default_val),
+                       device=device)
+    if locs.shape[0] > 0:
+        dense[locs[:, 0], locs[:, 1], locs[:, 2]] = values
+    return dense
+
+
+def make_recursive_func(func):
+    """Code from NeuralRecon, licensed under the Apache License, Version 2.0.
+
+    convert a function into recursive style to handle nested dict/list/tuple
+    variables
+    """
+    def wrapper(vars):
+        if isinstance(vars, list):
+            return [wrapper(x) for x in vars]
+        elif isinstance(vars, tuple):
+            return tuple([wrapper(x) for x in vars])
+        elif isinstance(vars, dict):
+            return {k: wrapper(v) for k, v in vars.items()}
+        else:
+            return func(vars)
+
+    return wrapper
+
+
+@make_recursive_func
+def tocuda(vars):
+    """Code from NeuralRecon, licensed under the Apache License, Version
+    2.0."""
+    if isinstance(vars, torch.Tensor):
+        return vars.cuda()
+    elif isinstance(vars, str):
+        return vars
+    else:
+        raise NotImplementedError(
+            'invalid input type {} for tensor2numpy'.format(type(vars)))
+
+
+def rotate_view_to_align_xyplane(Tr_camera_to_world):
+    """Code from NeuralRecon, licensed under the Apache License, Version
+    2.0."""
+    # world space normal [0, 0, 1]  camera space normal [0, -1, 0]
+    z_c = np.dot(np.linalg.inv(Tr_camera_to_world), np.array([0, 0, 1, 0]))[:3]
+    axis = np.cross(z_c, np.array([0, -1, 0]))
+    axis = axis / np.linalg.norm(axis)
+    theta = np.arccos(-z_c[1] / (np.linalg.norm(z_c)))
+    quat = transforms3d.quaternions.axangle2quat(axis, theta)
+    rotation_matrix = transforms3d.quaternions.quat2mat(quat)
+    return rotation_matrix
+
+
+def tsdf2mesh(voxel_size, origin, tsdf_vol):
+    """Code from NeuralRecon, licensed under the Apache License, Version
+    2.0."""
+    verts, faces, norms, _ = measure.marching_cubes(tsdf_vol, level=0)
+    # voxel grid coordinates to world coordinates
+    verts = verts * voxel_size + origin
+    mesh = trimesh.Trimesh(vertices=verts, faces=faces, vertex_normals=norms)
+    return mesh

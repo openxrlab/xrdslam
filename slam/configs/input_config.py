@@ -9,6 +9,7 @@ import tyro
 
 from slam.algorithms.coslam import CoSLAMConfig
 from slam.algorithms.dpvo import DPVOConfig
+from slam.algorithms.neural_recon import NeuralReconConfig
 from slam.algorithms.nice_slam import NiceSLAMConfig
 from slam.algorithms.point_slam import PointSLAMConfig
 from slam.algorithms.splatam import SplaTAMConfig
@@ -22,6 +23,7 @@ from slam.models.conv_onet import ConvOnetConfig
 from slam.models.conv_onet_pointslam import ConvOnet2Config
 from slam.models.gaussian_splatting import GaussianSplattingConfig
 from slam.models.joint_encoding import JointEncodingConfig
+from slam.models.neu_con_model import NeuConModelConfig
 from slam.models.sparse_voxel import SparseVoxelConfig
 from slam.models.vo_net_model import VONetModelConfig
 from slam.pipeline.mapper import MapperConfig
@@ -445,6 +447,46 @@ algorithm_configs['dpvo'] = XRDSLAMerConfig(
             mem=32,
             model=VONetModelConfig(
                 pretrained_path=Path('pretrained/dpvo/dpvo.pth')),
+        ),
+        visualizer=VisualizerConfig(),
+        enable_vis=False,
+        device='cuda:0'))
+
+algorithm_configs['neuralRecon'] = XRDSLAMerConfig(
+    algorithm_name='neuralRecon',
+    xrdslam=XRDSLAMConfig(
+        tracker=TrackerConfig(map_every=1,
+                              render_freq=50,
+                              use_relative_pose=False,
+                              save_debug_result=True,
+                              save_gt_mesh=True),
+        algorithm=NeuralReconConfig(
+            mapping_window_size=9,
+            max_depth=3.5,  # max of depth image
+            # make sure the pointcloud is in the positive direction of XYZ.
+            c2w_offset=[0.0, 0.0, 1.5],
+            mesh_use_double=False,
+            model=NeuConModelConfig(
+                pretrained_path=Path(
+                    'pretrained/neural_recon/model_000047.ckpt'),
+                model_cfg=[
+                    'SAVE_SCENE_MESH',
+                    True,
+                    'MODEL.N_LAYER',
+                    3,
+                    'MODEL.N_VOX',
+                    [96, 96, 96],
+                    'MODEL.VOXEL_SIZE',
+                    0.05,  # N_Vox * VOXEL_SIZE = local scene range
+                    'MODEL.BACKBONE2D.ARC',
+                    'fpn-mnas-1',
+                    'MODEL.FUSION.FUSION_ON',
+                    True,
+                    'MODEL.FUSION.FULL',
+                    True,
+                    'MODEL.POS_WEIGHT',
+                    1.5
+                ]),
         ),
         visualizer=VisualizerConfig(),
         enable_vis=False,

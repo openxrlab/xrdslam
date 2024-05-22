@@ -189,6 +189,8 @@ class Euroc(Dataset):
         self.cam0_distortion = np.array(
             cam0_cfg['distortion_coefficients']
         ) if 'distortion_coefficients' in cam0_cfg else None
+        # T_ic  camera to imu
+        self.T_ic0 = np.array(cam0_cfg['T_BS']['data']).reshape(4, 4)
 
         # imu0
         self.gyro_n = imu0_cfg['gyroscope_noise_density']
@@ -213,7 +215,8 @@ class Euroc(Dataset):
             f'{self.input_folder}/mav0/cam0/data.csv')
         self.n_img = len(self.color_paths)
         self.load_poses(
-            f'{self.input_folder}/mav0/state_groundtruth_estimate0/data.csv')
+            f'{self.input_folder}/mav0/state_groundtruth_estimate0/data.csv'
+        )  # imu to world
         self.load_imu(f'{self.input_folder}/mav0/imu0/data.csv')
 
     def __len__(self):
@@ -233,7 +236,7 @@ class Euroc(Dataset):
         color_data = torch.from_numpy(color_data)  # [H,W,C]
 
         # pose = self.poses[index]
-        pose = self.get_img_pose(self.img_timestamps[index])
+        pose = self.get_img_pose(self.img_timestamps[index])  # c2w
         imu_datas = torch.empty((0, ))
         if self.last_img_timestamp > 0:
             imu_datas = self.get_imu_data(self.last_img_timestamp,
@@ -246,7 +249,17 @@ class Euroc(Dataset):
 
     def get_img_pose(self, t0):
         nearest_index = np.argmin(np.abs(np.array(self.gt_timestamps) - t0))
-        return self.poses[nearest_index]
+        i2w = self.poses[nearest_index]  # imu to world
+        c2w = np.dot(i2w, self.T_ic0)  # camera to world, c2w
+        # The codebase assumes that the camera coordinate system is X left
+        # to right, Y down to up and Z in the negative viewing direction.
+        # Most datasets assume  X left to right, Y up to down and Z in the
+        # positive viewing direction. Therefore, we need to rotate the
+        # camera coordinate system. Multiplication of R_x (rotation aroun
+        # X-axis 180 degrees) from the right.
+        c2w[:3, 1] *= -1
+        c2w[:3, 2] *= -1
+        return torch.from_numpy(c2w).float()
 
     def get_imu_data(self, t0, t1):
         out_imus = []
@@ -388,6 +401,40 @@ class ScanNet(BaseDataset):
             self.poses.append(c2w)
 
 
+class Scenes7(BaseDataset):
+    def __init__(self, data_path, device='cuda:0'):
+        super(Scenes7, self).__init__(data_path, device)
+        self.color_paths = sorted(
+            glob.glob(os.path.join(self.input_folder, '*.color.png')),
+            key=lambda x: int(
+                os.path.basename(x).split('.')[0].split('-')[-1]))
+        self.depth_paths = sorted(
+            glob.glob(os.path.join(self.input_folder, '*.depth.png')),
+            key=lambda x: int(
+                os.path.basename(x).split('.')[0].split('-')[-1]))
+        self.load_poses(self.input_folder)
+        self.n_img = len(self.color_paths)
+
+    def load_poses(self, path):
+        self.poses = []
+        pose_paths = sorted(
+            glob.glob(os.path.join(path, '*.txt')),
+            key=lambda x: int(
+                os.path.basename(x).split('.')[0].split('-')[-1]))
+        for pose_path in pose_paths:
+            with open(pose_path, 'r') as f:
+                lines = f.readlines()
+            vals = []
+            for line in lines:
+                val = list(map(float, line.strip().split('\t')))
+                vals.append(val)
+            c2w = np.array(vals).reshape(4, 4)
+            c2w[:3, 1] *= -1
+            c2w[:3, 2] *= -1
+            c2w = torch.from_numpy(c2w).float()
+            self.poses.append(c2w)
+
+
 class CoFusion(BaseDataset):
     def __init__(self, data_path, device='cuda:0'):
         super(CoFusion, self).__init__(data_path, device)
@@ -513,4 +560,5 @@ dataset_dict = {
     'azure': Azure,
     'tumrgbd': TUM_RGBD,
     'euroc': Euroc,
+    '7scenes': Scenes7,
 }

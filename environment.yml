@@ -202,6 +202,9 @@ dependencies:
       - yacs==0.1.8
       - zipp==3.17.0
       - faiss-gpu==1.7.2
+      - transforms3d==0.4.1
+      - pyrender==0.1.45
       - git+https://github.com/facebookresearch/pytorch3d.git
       - git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
       - git+https://github.com/JonathonLuiten/diff-gaussian-rasterization-w-depth.git@cb65e4b86bc3bd8ed42174b72a62e8d3a3a71110
+      - git+https://github.com/mit-han-lab/torchsparse.git

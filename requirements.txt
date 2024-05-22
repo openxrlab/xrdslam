@@ -1,6 +1,7 @@
 faiss-gpu
 git+https://github.com/facebookresearch/pytorch3d.git
 git+https://github.com/JonathonLuiten/diff-gaussian-rasterization-w-depth.git@cb65e4b86bc3bd8ed42174b72a62e8d3a3a71110
+git+https://github.com/mit-han-lab/torchsparse.git
 git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch
 git+https://github.com/tfy14esa/evaluate_3d_reconstruction_lib.git
 imageio
@@ -11,6 +12,7 @@ natsort
 open3d==0.16.0
 opencv-python
 pandas
+pyrender
 pytorch-msssim
 pyyaml
 rtree==0.9.7
@@ -21,5 +23,6 @@ seaborn
 torch_scatter
 torchmetrics
 tqdm
+transforms3d
 trimesh==3.21.5
 tyro

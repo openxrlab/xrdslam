@@ -27,6 +27,9 @@ class EvalMatrics:
     eval_recon: bool = True
     correct_scale: bool = False
 
+    distance_thresh: float = 0.01
+    eval_2d_metric: bool = True
+
     def main(self) -> None:
         """Main function."""
         output = self.output_dir
@@ -65,12 +68,19 @@ class EvalMatrics:
                                        self.gt_mesh,
                                        transform_matrix=transform_matrix)
             result_3d_more = calc_3d_metric_New(
-                eval_mesh, self.gt_mesh, transform_matrix=transform_matrix)
-            result_2d = calc_2d_metric(eval_mesh,
-                                       self.gt_mesh,
-                                       transform_matrix=transform_matrix,
-                                       n_imgs=1000)
-            result = result_2d | result_3d | result_3d_more
+                eval_mesh,
+                self.gt_mesh,
+                distance_thresh=self.distance_thresh,
+                transform_matrix=transform_matrix)
+
+            result = result_3d | result_3d_more
+
+            if self.eval_2d_metric:
+                result_2d = calc_2d_metric(eval_mesh,
+                                           self.gt_mesh,
+                                           transform_matrix=transform_matrix,
+                                           n_imgs=1000)
+                result = result_2d | result
             print(result)
 
 

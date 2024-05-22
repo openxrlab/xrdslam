@@ -139,6 +139,7 @@ def calc_3d_metric(rec_meshfile,
 def calc_3d_metric_New(rec_meshfile,
                        gt_meshfile,
                        align=True,
+                       distance_thresh=0.01,
                        transform_matrix=None):
     pred_ply = rec_meshfile.split('/')[-1]
     last_slash_index = rec_meshfile.rindex('/')
@@ -148,7 +149,7 @@ def calc_3d_metric_New(rec_meshfile,
                                path_to_pred_ply,
                                gt_meshfile.split('/')[-1][:-4],
                                transform_matrix=transform_matrix,
-                               distance_thresh=0.01,
+                               distance_thresh=distance_thresh,
                                full_path_to_gt_ply=gt_meshfile,
                                icp_align=align)
     return result_3d
