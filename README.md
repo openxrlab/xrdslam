@@ -206,7 +206,7 @@ Please note that this license only applies to the code in our library, the depen
 
 ## Acknowledgement
 
-In addition to the implemented algorithm ([nice-slam](https://github.com/cvg/nice-slam),[co-slam](https://github.com/HengyiWang/Co-SLAM),[Vox-Fusion](https://github.com/zju3dv/Vox-Fusion),[Point_SLAM](https://github.com/eriksandstroem/Point-SLAM),[splaTAM](https://github.com/spla-tam/SplaTAM), [DPVO](https://github.com/princeton-vl/DPVO)), our code also adapt some codes from [nerfStudio](https://github.com/nerfstudio-project/nerfstudio/), [sdfstudio](https://autonomousvision.github.io/sdfstudio/). Thanks for making the code available.
+In addition to the implemented algorithm ([nice-slam](https://github.com/cvg/nice-slam),[co-slam](https://github.com/HengyiWang/Co-SLAM),[Vox-Fusion](https://github.com/zju3dv/Vox-Fusion),[Point_SLAM](https://github.com/eriksandstroem/Point-SLAM),[splaTAM](https://github.com/spla-tam/SplaTAM), [DPVO](https://github.com/princeton-vl/DPVO), [NeuralRecon](https://github.com/zju3dv/NeuralRecon)), our code also adapt some codes from [nerfStudio](https://github.com/nerfstudio-project/nerfstudio/), [sdfstudio](https://autonomousvision.github.io/sdfstudio/). Thanks for making the code available.
 
 ## Built On
 
