@@ -75,14 +75,16 @@ class OfflineViewer:
                     frontend.update_cloud(cloudfile)
             frontend.update_pose(1, estimate_c2w_list[i], gt=False)
             # Note: not show gt_traj for splaTAM
-            if algorithm_name != 'splaTAM' and algorithm_name != 'dpvo':
+            if (algorithm_name != 'splaTAM' and algorithm_name != 'dpvo'
+                    and algorithm_name != 'neuralRecon'):
                 frontend.update_pose(1, gt_c2w_list[i], gt=True)
             # the visualizer might get stuck if update every frame
             # with a long sequence (10000+ frames)
             if i % 10 == 0:
                 frontend.update_cam_trajectory(i, gt=False)
                 # Note: not show gt_traj for splaTAM
-                if algorithm_name != 'splaTAM' and algorithm_name != 'dpvo':
+                if (algorithm_name != 'splaTAM' and algorithm_name != 'dpvo'
+                        and algorithm_name != 'neuralRecon'):
                     frontend.update_cam_trajectory(i, gt=True)
 
         if self.config.save_rendering:

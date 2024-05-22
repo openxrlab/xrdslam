@@ -90,6 +90,7 @@ def draw_trajectory(queue, output, init_pose, cam_scale, save_rendering, near,
                     if draw_trajectory.mesh is not None:
                         vis.remove_geometry(draw_trajectory.mesh)
                     draw_trajectory.mesh = o3d.io.read_triangle_mesh(meshfile)
+                    draw_trajectory.mesh.compute_vertex_normals()
                     vis.add_geometry(draw_trajectory.mesh)
 
                 elif data[0] == 'cloud':
@@ -157,6 +158,10 @@ def draw_trajectory(queue, output, init_pose, cam_scale, save_rendering, near,
     vis.create_window(window_name='3D show', height=480, width=640)
     vis.get_render_option().point_size = 4
     vis.get_render_option().mesh_show_back_face = True
+    if algorithm_name == 'neuralRecon':
+        vis.get_render_option(
+        ).mesh_color_option = o3d.visualization.MeshColorOption.Color
+        vis.get_render_option().mesh_show_wireframe = False
 
     ctr = vis.get_view_control()
     ctr.set_constant_z_near(near)

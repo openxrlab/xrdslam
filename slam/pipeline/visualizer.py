@@ -1,7 +1,7 @@
 import functools
 from dataclasses import dataclass, field
 from queue import Empty
-from typing import Type
+from typing import Optional, Type
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -20,6 +20,7 @@ class VisualizerConfig(InstantiateConfig):
     """Visualizer  Config."""
     _target: Type = field(default_factory=lambda: Visualizer)
     save_rendering: bool = True
+    algorithm_name: Optional[str] = None
     eval_img: bool = False
     win_w: int = 800
     win_h: int = 600
@@ -223,6 +224,7 @@ class Visualizer():
                         self.show_mesh.vertex_colors = \
                             o3d.utility.Vector3dVector(
                                 vertex_colors_rgb / 255.0)
+                    self.show_mesh.compute_vertex_normals()
                     vis.add_geometry(self.show_mesh)
                     if self.config.save_rendering:
                         mesh_savepath = f'{self.out_dir}/mesh/{idx:05d}.ply'
@@ -305,6 +307,10 @@ class Visualizer():
                           visible=True)
         vis.get_render_option().point_size = 4
         vis.get_render_option().mesh_show_back_face = True
+        if self.config.algorithm_name == 'neuralRecon':
+            vis.get_render_option(
+            ).mesh_color_option = o3d.visualization.MeshColorOption.Color
+            vis.get_render_option().mesh_show_wireframe = False
 
         # run open3d visualizer
         vis.run()

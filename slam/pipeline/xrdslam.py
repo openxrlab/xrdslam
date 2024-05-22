@@ -25,6 +25,7 @@ class XRDSLAMConfig(InstantiateConfig):
     data: Optional[Path] = None
     data_type: Optional[str] = 'tum'
     out_dir: Path = Path('outputs')
+    algorithm_name: Optional[str] = None
 
     tracker: TrackerConfig = TrackerConfig()
     mapper: MapperConfig = MapperConfig()
@@ -67,6 +68,7 @@ class XRDSLAM():
             out_dir=self.config.out_dir)
         self.mapper = self.config.mapper.setup()
         if self.config.enable_vis:
+            self.config.visualizer.algorithm_name = self.config.algorithm_name
             self.visualizer = self.config.visualizer.setup(
                 camera=self.camera, out_dir=self.config.out_dir)
 

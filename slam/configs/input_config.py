@@ -458,7 +458,7 @@ algorithm_configs['neuralRecon'] = XRDSLAMerConfig(
         tracker=TrackerConfig(map_every=1,
                               render_freq=50,
                               use_relative_pose=False,
-                              save_debug_result=True,
+                              save_debug_result=False,
                               save_gt_mesh=True),
         algorithm=NeuralReconConfig(
             mapping_window_size=9,

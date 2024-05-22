@@ -51,6 +51,7 @@ class XRDSLAMer:
 
     def setup(self):
         self.config.xrdslam.out_dir = self.config.output_dir
+        self.config.xrdslam.algorithm_name = self.config.algorithm_name
         self.slam = self.config.xrdslam.setup()
 
     def run(self) -> None:

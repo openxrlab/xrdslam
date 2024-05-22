@@ -211,12 +211,12 @@ class Tracker():
         # extract mesh
         mesh = algorithm.get_mesh()
         if mesh is not None:
-            culled_mesh = cull_mesh(
-                dataset=self.dataset,
-                mesh=mesh,
-                estimate_c2w_list=algorithm.get_estimate_c2w_list(),
-                eval_rec=True)
-            viz_buffer.put_nowait(('mesh', idx_np, culled_mesh))
+            # culled_mesh = cull_mesh(
+            #     dataset=self.dataset,
+            #     mesh=mesh,
+            #     estimate_c2w_list=algorithm.get_estimate_c2w_list(),
+            #     eval_rec=True)
+            viz_buffer.put_nowait(('mesh', idx_np, mesh))
         # get pointcloud
         cloud = algorithm.get_cloud(cur_c2w_np, gt_depth_np=gt_depth_np)
         if cloud is not None:
